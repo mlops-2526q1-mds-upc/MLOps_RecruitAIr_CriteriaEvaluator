@@ -4,7 +4,7 @@ from loguru import logger
 from tqdm import tqdm
 import typer
 
-from recruitair.config import PROCESSED_DATA_DIR, RAW_DATA_DIR
+from recruitair.config.config_base import PROCESSED_DATA_DIR, RAW_DATA_DIR
 
 app = typer.Typer()
 

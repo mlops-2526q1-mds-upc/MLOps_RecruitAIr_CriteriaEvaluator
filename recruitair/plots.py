@@ -4,7 +4,7 @@ from loguru import logger
 from tqdm import tqdm
 import typer
 
-from recruitair.config import FIGURES_DIR, PROCESSED_DATA_DIR
+from recruitair.config.config_base import FIGURES_DIR, PROCESSED_DATA_DIR
 
 app = typer.Typer()
 

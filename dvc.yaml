@@ -1,0 +1,27 @@
+stages:
+  download_hugging_kaggle:
+    cmd: python -m recruitair.data.download_raw_dataset
+    deps:
+    - recruitair/data/download_raw_dataset.py
+    - recruitair/config/data_download_config.py
+    outs:
+    - data/raw/raw_jsons/
+    - data/raw/job-skill-set.csv
+    - data/raw/recruitment.csv
+  preprocess_json:
+    cmd: python -m recruitair.data.preprocess_json
+    deps:
+    - data/raw/raw_jsons/
+    - recruitair/data/preprocess_json.py
+    - recruitair/config/data_preprocess_config.py
+    outs:
+    - data/interim/preprocessed_cvs.jsonl
+  split_data:
+    cmd: python -m recruitair.data.split_data
+    deps:
+    - data/interim/preprocessed_cvs.jsonl
+    - recruitair/config/data_split_config.py
+    outs:
+    - data/processed/test.jsonl
+    - data/processed/train.jsonl
+    - data/processed/validation.jsonl
