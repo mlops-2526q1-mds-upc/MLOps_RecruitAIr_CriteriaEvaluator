@@ -1,1 +1,3 @@
-from recruitair import config  # noqa: F401
+import dagshub
+
+dagshub.init(repo_owner="danirc2", repo_name="MLOps_RecruitAIr", mlflow=True)
