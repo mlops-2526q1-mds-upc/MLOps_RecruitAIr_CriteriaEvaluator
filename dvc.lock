@@ -1,0 +1,72 @@
+schema: '2.0'
+stages:
+  download_hugging_kaggle:
+    cmd: python -m recruitair.data.download_raw_dataset
+    deps:
+    - path: recruitair/config/data_download_config.py
+      hash: md5
+      md5: 580a1c4135fbeda3861f4030eba230d2
+      size: 308
+    - path: recruitair/data/download_raw_dataset.py
+      hash: md5
+      md5: ced114456f99452af04a6a5db92dc57c
+      size: 3467
+    outs:
+    - path: data/raw/job-skill-set.csv
+      hash: md5
+      md5: 91aae8929ba2216f5f7df451583e5b7c
+      size: 4910232
+    - path: data/raw/raw_jsons/
+      hash: md5
+      md5: d93d60248b2ec8721ebe15a333535407.dir
+      size: 13682579
+      nfiles: 1032
+    - path: data/raw/recruitment.csv
+      hash: md5
+      md5: 5e02647bac4970269470190ad4978148
+      size: 10156046
+  preprocess_json:
+    cmd: python -m recruitair.data.preprocess_json
+    deps:
+    - path: data/raw/raw_jsons/
+      hash: md5
+      md5: d93d60248b2ec8721ebe15a333535407.dir
+      size: 13682579
+      nfiles: 1032
+    - path: recruitair/config/data_preprocess_config.py
+      hash: md5
+      md5: ad35dcc4f9d07cea3d4679fc8e3cd16d
+      size: 213
+    - path: recruitair/data/preprocess_json.py
+      hash: md5
+      md5: c782bb4c061b54aa22bedf081360fe35
+      size: 3414
+    outs:
+    - path: data/interim/preprocessed_cvs.jsonl
+      hash: md5
+      md5: e806f8672508e2e2aafcbd72ccd5c91c
+      size: 20132069
+  split_data:
+    cmd: python -m recruitair.data.split_data
+    deps:
+    - path: data/interim/preprocessed_cvs.jsonl
+      hash: md5
+      md5: e806f8672508e2e2aafcbd72ccd5c91c
+      size: 20132069
+    - path: recruitair/config/data_split_config.py
+      hash: md5
+      md5: 214f08266db1eda1536bc8a28dcd904e
+      size: 209
+    outs:
+    - path: data/processed/test.jsonl
+      hash: md5
+      md5: f1a7eb369fdfc7042c88c1e9cab1f820
+      size: 1998603
+    - path: data/processed/train.jsonl
+      hash: md5
+      md5: 9203e501192376ffe9e3c5b6831221fe
+      size: 14254882
+    - path: data/processed/validation.jsonl
+      hash: md5
+      md5: 299deed31aa2353fdcd2f92cd799936a
+      size: 4075916

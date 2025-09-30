@@ -3,7 +3,7 @@ stages:
     cmd: python -m recruitair.data.download_raw_dataset
     deps:
     - recruitair/data/download_raw_dataset.py
-    - recruitair/config.py
+    - recruitair/config/data_download_config.py
     outs:
     - data/raw/raw_jsons/
     - data/raw/job-skill-set.csv
@@ -13,17 +13,15 @@ stages:
     deps:
     - data/raw/raw_jsons/
     - recruitair/data/preprocess_json.py
-    - recruitair/config.py
+    - recruitair/config/data_preprocess_config.py
     outs:
-    - data/interim/preprocessed_resumes.json
-    - data/interim/preprocessed_resumes.parquet
-  split_parquet:
-    cmd: python -m src.data.split_data
+    - data/interim/preprocessed_cvs.jsonl
+  split_data:
+    cmd: python -m recruitair.data.split_data
     deps:
-    - data/interim/preprocessed_resumes.parquet
-    - recruitair/data/split_data.py
-    - recruitair/config.py
+    - data/interim/preprocessed_cvs.jsonl
+    - recruitair/config/data_split_config.py
     outs:
-    - data/processed/test.parquet
-    - data/processed/train.parquet
-    - data/processed/validation.parquet
+    - data/processed/test.jsonl
+    - data/processed/train.jsonl
+    - data/processed/validation.jsonl

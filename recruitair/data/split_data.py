@@ -7,14 +7,14 @@ def split_data():
     """
     Split the cleaned data into train, validation, and test sets and save them to the 'data/processed' directory.
 
-    Input: INTERIM_DATA_DIR / "preprocessed_jobs.jsonl"
+    Input: INTERIM_DATA_DIR / "preprocessed_cvs.jsonl"
     Output: JSONL files in PROCESSED_DATA_DIR:
         - train.jsonl
         - validation.jsonl
         - test.jsonl
     """
     # Leer el JSON (si es JSONL usar lines=True, si es JSON normal quitar lines=True)
-    df = pd.read_json(INTERIM_DATA_DIR / "preprocessed_jobs.jsonl", lines=True)
+    df = pd.read_json(INTERIM_DATA_DIR / "preprocessed_cvs.jsonl", lines=True)
 
     # First split into train and remaining
     train_df, remaining_df = train_test_split(

@@ -1,18 +1,15 @@
 #!/usr/bin/env python3
 """
-Preprocess job JSONs into JSONL with job_description + criteria list.
+Preprocess job JSONs into JSONL with resume + criteria + score.
 
 Input:
  - JSON files (ej: match_X.json / mismatch_X.json)
 Output:
  - JSONL file, each line:
     {
-      "job_description": "...",
-      "criteria": [
-        {"name": "leadership", "importance": 35},
-        {"name": "experience", "importance": 15},
-        ...
-      ]
+      "resume": "...",
+      "criteria": "leadership",
+      "score": 2
     }
 """
 
@@ -32,29 +29,38 @@ def find_target_json_files(input_dir: Path) -> List[Path]:
     return sorted([p for p in input_dir.rglob("*.json") if FNAME_RE.match(p.name)])
 
 
-def process_file(path: Path) -> Optional[dict]:
-    """Load JSON and extract job_description + criteria as list of dicts."""
+def process_file(path: Path) -> List[dict]:
+    """Load JSON and extract resume + criteria + score."""
     try:
         with path.open("r", encoding="utf-8") as fh:
             obj = json.load(fh)
     except Exception as e:
         print(f"WARNING: Failed to parse {path}: {e}", file=sys.stderr)
-        return None
+        return []
 
     inp = obj.get("input", {})
-    job_description = inp.get("job_description", "").strip()
+    out = obj.get("output", {})
 
-    macro_dict = inp.get("macro_dict", {}) or {}
-    micro_dict = inp.get("micro_dict", {}) or {}
+    resume = inp.get("resume", "").strip()
 
-    criteria = []
-    for name, importance in {**macro_dict, **micro_dict}.items():
-        criteria.append({"name": name, "importance": importance})
+    scores = out.get("scores", {})
+    macro_scores = scores.get("macro_scores", []) or []
+    micro_scores = scores.get("micro_scores", []) or []
 
-    return {
-        "job_description": job_description,
-        "criteria": criteria,
-    }
+    rows = []
+
+    # Usamos macro_scores y micro_scores; puedes comentar uno si solo quieres uno
+    for entry in macro_scores + micro_scores:
+        criteria = entry.get("criteria")
+        score = entry.get("score")
+        if criteria is not None and score is not None:
+            rows.append({
+                "resume": resume,
+                "criteria": criteria,
+                "score": score
+            })
+
+    return rows
 
 
 def main():
@@ -68,8 +74,8 @@ def main():
     p.add_argument(
         "--output-jsonl",
         type=Path,
-        default=INTERIM_DATA_DIR / "preprocessed_jobs.jsonl",
-        help="Output JSONL file (default: INTERIM_DATA_DIR/preprocessed_jobs.jsonl)",
+        default=INTERIM_DATA_DIR / "preprocessed_cvs.jsonl",
+        help="Output JSONL file (default: INTERIM_DATA_DIR/preprocessed_cvs.jsonl)",
     )
     args = p.parse_args()
 
@@ -90,9 +96,10 @@ def main():
     out_jsonl.parent.mkdir(parents=True, exist_ok=True)
     with out_jsonl.open("w", encoding="utf-8") as out_f:
         for idx, fp in enumerate(files, start=1):
-            res = process_file(fp)
-            if res:
-                out_f.write(json.dumps(res, ensure_ascii=False) + "\n")
+            rows = process_file(fp)
+            for row in rows:
+                out_f.write(json.dumps(row, ensure_ascii=False) + "\n")
+
             if idx % 100 == 0 or idx == len(files):
                 print(f"Progress: {idx}/{len(files)} processed.")
 
