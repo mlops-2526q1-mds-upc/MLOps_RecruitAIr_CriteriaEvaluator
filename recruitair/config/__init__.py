@@ -1,0 +1,1 @@
+"""RecruitAIr common project config."""

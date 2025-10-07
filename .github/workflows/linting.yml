@@ -1,0 +1,34 @@
+name: linting
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  pylint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.10'
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - name: Install Dependencies
+        run: uv sync --locked --all-extras --dev
+      - name: Format code
+        run: |
+          uv run black recruitair && \
+          uv run flake8 recruitair && \
+          uv run isort **/**.py
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v6
+      - name: Run linters
+        run: |
+          uv run pylint --recursive=y recruitair

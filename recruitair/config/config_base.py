@@ -1,3 +1,5 @@
+"""Base project config."""
+
 from pathlib import Path
 
 from dotenv import load_dotenv

@@ -1,3 +1,5 @@
+"""Config for downloading data."""
+
 from .config_base import PROJ_ROOT
 
 # Paths for data download
