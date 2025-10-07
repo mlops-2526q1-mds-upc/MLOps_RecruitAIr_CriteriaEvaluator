@@ -15,13 +15,14 @@ Output:
 
 import argparse
 import json
+from pathlib import Path
 import re
 import sys
-from pathlib import Path
-from typing import List, Optional
-from recruitair.config.data_preprocess_config import RAW_DATA_DIR, INTERIM_DATA_DIR
+from typing import List
 
-FNAME_RE = re.compile(r'^(?P<label>match|mismatch)_(?P<num>\d+)\.json$', re.IGNORECASE)
+from recruitair.config.data_preprocess_config import INTERIM_DATA_DIR, RAW_DATA_DIR
+
+FNAME_RE = re.compile(r"^(?P<label>match|mismatch)_(?P<num>\d+)\.json$", re.IGNORECASE)
 
 
 def find_target_json_files(input_dir: Path) -> List[Path]:
@@ -34,7 +35,7 @@ def process_file(path: Path) -> List[dict]:
     try:
         with path.open("r", encoding="utf-8") as fh:
             obj = json.load(fh)
-    except Exception as e:
+    except (FileNotFoundError, json.JSONDecodeError) as e:
         print(f"WARNING: Failed to parse {path}: {e}", file=sys.stderr)
         return []
 
@@ -54,19 +55,20 @@ def process_file(path: Path) -> List[dict]:
         criteria = entry.get("criteria")
         score = entry.get("score")
         if criteria is not None and score is not None:
-            rows.append({
-                "resume": resume,
-                "criteria": criteria,
-                "score": score
-            })
+            rows.append({"resume": resume, "criteria": criteria, "score": score})
 
     return rows
 
 
 def main():
+    """
+    Entrypoint for preprocessing job JSONs into JSONL with resume, criteria, and score.
+    """
+
     p = argparse.ArgumentParser(description="Preprocess jobs JSONs into JSONL")
     p.add_argument(
-        "--input-dir", "-i",
+        "--input-dir",
+        "-i",
         type=Path,
         default=RAW_DATA_DIR / "raw_jsons",
         help="Directory containing JSON files (default: RAW_DATA_DIR/raw_jsons)",
@@ -88,7 +90,10 @@ def main():
 
     files = find_target_json_files(input_dir)
     if not files:
-        print(f"No files matching match_X.json or mismatch_X.json found under {input_dir}", file=sys.stderr)
+        print(
+            f"No files matching match_X.json or mismatch_X.json found under {input_dir}",
+            file=sys.stderr,
+        )
         sys.exit(0)
 
     print(f"Found {len(files)} JSON files. Processing...")
