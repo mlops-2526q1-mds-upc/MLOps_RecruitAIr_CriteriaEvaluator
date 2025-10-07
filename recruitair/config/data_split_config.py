@@ -1,3 +1,5 @@
+"""Config for splitting the data."""
+
 from .config_base import PROJ_ROOT
 
 DATA_DIR = PROJ_ROOT / "data"
