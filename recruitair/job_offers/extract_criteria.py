@@ -8,7 +8,6 @@ from .models import KeyCriteriaResponse
 PROMPT_VERSION = os.getenv("CRITERIA_EXTRACTION_PROMPT_VERSION", "1")
 if not PROMPT_VERSION.isdigit():
     raise ValueError("CRITERIA_EXTRACTION_PROMPT_VERSION must be a digit or not set")
-PROMPT_VERSION = int(PROMPT_VERSION)
 prompt_template = mlflow.genai.load_prompt("job-offer-criteria-extraction", version=PROMPT_VERSION)
 
 

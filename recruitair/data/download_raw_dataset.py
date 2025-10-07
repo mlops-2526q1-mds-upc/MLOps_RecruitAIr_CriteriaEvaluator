@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import kagglehub
 from kagglehub import KaggleDatasetAdapter
 import os
@@ -6,7 +8,7 @@ from huggingface_hub import list_repo_files, hf_hub_download
 from typing import Optional
 from recruitair.config.data_download_config import RAW_DATA_DIR, HF_RESUME_SCORE_DETAILS_REPO, HF_RESUME_SCORE_DETAILS_REVISION
 
-def download_kaggle_dataset():
+def download_kaggle_dataset() -> None:
     """
     Download the dataset from Kaggle and save it to the 'data/raw' directory.
     """
@@ -30,10 +32,10 @@ def download_kaggle_dataset():
 
 def download_huggingface_dataset_jsons(
     repo_id: str,
-    raw_data_dir: str,
+    raw_data_dir: str | Path,
     target_subdir: Optional[str] = None,
     revision: str = "main"
-):
+) -> None:
     """
     Download all .json files from a HF dataset repo (repo_type='dataset') and copy them
     into raw_data_dir/target_subdir (creates if needed), also save the commit SHA1.

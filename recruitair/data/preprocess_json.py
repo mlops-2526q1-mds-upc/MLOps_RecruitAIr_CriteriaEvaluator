@@ -79,8 +79,8 @@ def main():
     )
     args = p.parse_args()
 
-    input_dir: Path = args.input_dir
-    out_jsonl: Path = args.output_jsonl
+    input_dir = args.input_dir
+    out_jsonl = args.output_jsonl
 
     if not input_dir.exists():
         print(f"ERROR: input directory does not exist: {input_dir}", file=sys.stderr)
