@@ -1,3 +1,5 @@
+"""Config for data pre-processing."""
+
 from .config_base import PROJ_ROOT
 
 # Paths for preprocessing
