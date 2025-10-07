@@ -24,12 +24,19 @@ dependencies = [
     "huggingface-hub>=0.35.3",
     "isort",
     "kagglehub>=0.3.13",
+    "langchain-ollama>=0.3.10",
     "loguru",
+    "mlflow>=3.4.0",
+    "mypy>=1.18.2",
+    "pandas-stubs>=2.3.2.250926",
     "pip",
+    "pylint>=3.3.9",
     "python-dotenv",
+    "ruff>=0.13.3",
     "scikit-learn>=1.7.2",
     "tqdm",
     "typer",
+    "types-tqdm>=4.67.0.20250809",
 ]
 requires-python = "~=3.10.0"
 
@@ -48,4 +55,6 @@ profile = "black"
 known_first_party = ["recruitair"]
 force_sort_within_sections = true
 
-
+[[tool.mypy.overrides]]
+module = ["sklearn.*", "kagglehub"]
+follow_untyped_imports = true
