@@ -12,8 +12,6 @@ This model evaluates the fit of an applicant profile to user-defined criteria. I
 
 ### Model Description
 
-<!-- Provide a longer summary of what this model is. -->
-
 RecruitAIr_CriteriaEvaluator is a Natural Language Processing (NLP) model designed to compare applicant information with job criteria extracted from job postings (via RecruitAIr_JobCriteriaExtractor). It generates a numerical score (0–1) for each applicant-criterion pair, indicating how well the applicant meets the requirement.
 The model ensures explainability by providing criterion-specific scores, which can later be aggregated (weighted averages) into overall applicant suitability rankings.
 
