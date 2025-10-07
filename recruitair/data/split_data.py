@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split
 from recruitair.config.data_split_config import  INTERIM_DATA_DIR, PROCESSED_DATA_DIR, SEED, TRAIN_SPLIT, VALIDATION_SPLIT
 
 
-def split_data():
+def split_data() -> None:
     """
     Split the cleaned data into train, validation, and test sets and save them to the 'data/processed' directory.
 
