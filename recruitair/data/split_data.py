@@ -27,9 +27,7 @@ def split_data() -> None:
     df = pd.read_json(INTERIM_DATA_DIR / "preprocessed_cvs.jsonl", lines=True)
 
     # First split into train and remaining
-    train_df, remaining_df = train_test_split(
-        df, train_size=TRAIN_SPLIT, random_state=SEED, shuffle=True
-    )
+    train_df, remaining_df = train_test_split(df, train_size=TRAIN_SPLIT, random_state=SEED, shuffle=True)
 
     # Compute validation proportion relative to remaining
     validation_ratio = VALIDATION_SPLIT / (1 - TRAIN_SPLIT)
@@ -37,16 +35,13 @@ def split_data() -> None:
         remaining_df, train_size=validation_ratio, random_state=SEED, shuffle=True
     )
 
+    # Create parent folder if not exists
+    PROCESSED_DATA_DIR.mkdir(parents=True, exist_ok=True)
+
     # Save to JSONL
-    train_df.to_json(
-        PROCESSED_DATA_DIR / "train.jsonl", orient="records", lines=True, force_ascii=False
-    )
-    validation_df.to_json(
-        PROCESSED_DATA_DIR / "validation.jsonl", orient="records", lines=True, force_ascii=False
-    )
-    test_df.to_json(
-        PROCESSED_DATA_DIR / "test.jsonl", orient="records", lines=True, force_ascii=False
-    )
+    train_df.to_json(PROCESSED_DATA_DIR / "train.jsonl", orient="records", lines=True, force_ascii=False)
+    validation_df.to_json(PROCESSED_DATA_DIR / "validation.jsonl", orient="records", lines=True, force_ascii=False)
+    test_df.to_json(PROCESSED_DATA_DIR / "test.jsonl", orient="records", lines=True, force_ascii=False)
 
     print("✅ Split completed:")
     print(f" - Train: {len(train_df)} rows -> {PROCESSED_DATA_DIR / 'train.jsonl'}")
