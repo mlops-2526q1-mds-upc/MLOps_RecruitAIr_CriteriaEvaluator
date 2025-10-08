@@ -9,8 +9,8 @@ stages:
       size: 348
     - path: recruitair/data/download_raw_dataset.py
       hash: md5
-      md5: 936a8bcb5fbfd5b02f0dca9dfd8a2511
-      size: 4296
+      md5: 9191ced0a97f4adc3a63f4b4dc34e6a8
+      size: 4247
     outs:
     - path: data/raw/job-skill-set.csv
       hash: md5
