@@ -47,6 +47,8 @@ dependencies = [
     "python-dotenv",
     "ruff>=0.13.3",
     "scikit-learn>=1.7.2",
+    "tensorflow>=2.20.0",
+    "tf-keras>=2.20.1",
     "torch>=2.8.0",
     "torchviz>=0.0.3",
     "tqdm",
