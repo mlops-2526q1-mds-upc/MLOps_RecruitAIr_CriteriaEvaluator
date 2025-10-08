@@ -33,10 +33,7 @@ class CustomQwenModel(nn.Module):
         return logits
 
 
-def get_custom_qwen_model(model_name="Qwen/Qwen3-0.6B", hidden_dim=512, dropout=0.5) -> CustomQwenModel:
-    # Load the pre-trained model
-    original_model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype="auto", device_map="auto")
-
+def customize_qwen_model(original_model: nn.Module, hidden_dim=512, dropout=0.5) -> CustomQwenModel:
     # Extract the backbone (all layers except the LM head)
     backbone = next(original_model.children())
 
@@ -53,3 +50,5 @@ def get_custom_qwen_model(model_name="Qwen/Qwen3-0.6B", hidden_dim=512, dropout=
 def freeze_custom_qwen_backbone(model: CustomQwenModel):
     for param in model.backbone.parameters():
         param.requires_grad = False
+
+    model.backbone.eval()
