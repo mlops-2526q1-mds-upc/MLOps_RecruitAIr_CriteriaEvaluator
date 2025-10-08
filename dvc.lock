@@ -39,20 +39,20 @@ stages:
       size: 256
     - path: recruitair/data/preprocess_json.py
       hash: md5
-      md5: 636f69af06adbfe8231266d82d4eb41c
-      size: 3516
+      md5: a8c0dd70db0d4804f1cc5f808d3c44e4
+      size: 3626
     outs:
     - path: data/interim/preprocessed_cvs.jsonl
       hash: md5
-      md5: e806f8672508e2e2aafcbd72ccd5c91c
-      size: 20132069
+      md5: 8e7f578940afc57e79545d6c3d0d65a4
+      size: 20128435
   split_data:
     cmd: python -m recruitair.data.split_data
     deps:
     - path: data/interim/preprocessed_cvs.jsonl
       hash: md5
-      md5: e806f8672508e2e2aafcbd72ccd5c91c
-      size: 20132069
+      md5: 8e7f578940afc57e79545d6c3d0d65a4
+      size: 20128435
     - path: recruitair/config/data_split_config.py
       hash: md5
       md5: 666960ec6178704c1914b6f6617e8a05
@@ -60,13 +60,13 @@ stages:
     outs:
     - path: data/processed/test.jsonl
       hash: md5
-      md5: f1a7eb369fdfc7042c88c1e9cab1f820
-      size: 1998603
+      md5: 8f697fbf8795398d2cbedc8cf57b634f
+      size: 2069485
     - path: data/processed/train.jsonl
       hash: md5
-      md5: 9203e501192376ffe9e3c5b6831221fe
-      size: 14254882
+      md5: 52dfa4937b7acad2d52961731d71d661
+      size: 14355712
     - path: data/processed/validation.jsonl
       hash: md5
-      md5: 299deed31aa2353fdcd2f92cd799936a
-      size: 4075916
+      md5: 81fab5e53442debb14d884bf9518fc1e
+      size: 3900809
