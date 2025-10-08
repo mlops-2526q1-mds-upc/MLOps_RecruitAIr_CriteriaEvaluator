@@ -10,6 +10,7 @@ from huggingface_hub.utils import HfHubHTTPError
 import kagglehub
 from kagglehub import KaggleDatasetAdapter
 from requests import RequestException
+from tqdm import tqdm
 
 from recruitair.config.data_download_config import (
     HF_RESUME_SCORE_DETAILS_REPO,
@@ -73,18 +74,8 @@ def download_huggingface_dataset_jsons(
         return
 
     print(f"Found {len(json_paths)} JSON files. Downloading...")
-    downloaded = 0
-    for rel_path in sorted(json_paths):
-        downloaded = download_huggingface_dataset(
-            repo_id=repo_id,
-            rel_path=rel_path,
-            revision=revision,
-            dest_dir=dest_dir,
-        )
-        if downloaded:
-            downloaded += 1
-        if downloaded % 50 == 0:
-            print(f"  - downloaded {downloaded}/{len(json_paths)}")
+    for rel_path in tqdm(sorted(json_paths), desc="Downloading JSON files", unit="file", ncols=80, leave=False):
+        download_huggingface_dataset(repo_id=repo_id, rel_path=rel_path, revision=revision, dest_dir=dest_dir)
 
     # Save SHA1
     sha1_path = os.path.join(dest_dir, "sha1.txt")
