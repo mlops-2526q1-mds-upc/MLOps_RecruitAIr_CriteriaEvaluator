@@ -37,6 +37,9 @@ def download_kaggle_dataset() -> None:
         "job_applicant_dataset.csv",
     )
 
+    # Create the parent dataset if not exists
+    os.makedirs(RAW_DATA_DIR, exist_ok=True)
+
     df_job_skill_set.to_csv(skill_set_file)
     df_recruitment.to_csv(recruitment_file)
 
@@ -101,9 +104,7 @@ def download_huggingface_dataset(
     """Download a huggingface dataset and store it in a file."""
 
     try:
-        local_path = hf_hub_download(
-            repo_id=repo_id, filename=rel_path, repo_type="dataset", revision=revision
-        )
+        local_path = hf_hub_download(repo_id=repo_id, filename=rel_path, repo_type="dataset", revision=revision)
     except (HfHubHTTPError, ValueError, RequestException) as e:
         print(f"  - ERROR downloading {rel_path}: {e}")
         return False
