@@ -74,8 +74,12 @@ def download_huggingface_dataset_jsons(
         return
 
     print(f"Found {len(json_paths)} JSON files. Downloading...")
+    num_downloaded = 0
     for rel_path in tqdm(sorted(json_paths), desc="Downloading JSON files", unit="file", ncols=80, leave=False):
-        download_huggingface_dataset(repo_id=repo_id, rel_path=rel_path, revision=revision, dest_dir=dest_dir)
+        downloaded = download_huggingface_dataset(
+            repo_id=repo_id, rel_path=rel_path, revision=revision, dest_dir=dest_dir
+        )
+        num_downloaded += int(downloaded)
 
     # Save SHA1
     sha1_path = os.path.join(dest_dir, "sha1.txt")
@@ -83,7 +87,7 @@ def download_huggingface_dataset_jsons(
         f.write(revision)
     print(f"SHA1 saved to {sha1_path}")
 
-    print(f"Done. {downloaded}/{len(json_paths)} JSON files saved to: {dest_dir}")
+    print(f"Done. {num_downloaded}/{len(json_paths)} JSON files saved to: {dest_dir}")
 
 
 def download_huggingface_dataset(
