@@ -19,7 +19,7 @@ class _GradingHead(nn.Module):
 
 
 class CustomQwenModel(nn.Module):
-    def __init__(self, backbone, head):
+    def __init__(self, backbone: nn.Module, head: nn.Module):
         super().__init__()
         self.backbone = backbone
         self.head = head
