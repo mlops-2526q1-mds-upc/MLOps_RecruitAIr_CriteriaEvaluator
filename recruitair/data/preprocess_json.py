@@ -43,6 +43,9 @@ def process_file(path: Path) -> List[dict]:
     out = obj.get("output", {})
 
     resume = inp.get("resume", "").strip()
+    if not resume:
+        print(f"WARNING: No resume found in {path}", file=sys.stderr)
+        return []
 
     scores = out.get("scores", {})
     macro_scores = scores.get("macro_scores", []) or []
