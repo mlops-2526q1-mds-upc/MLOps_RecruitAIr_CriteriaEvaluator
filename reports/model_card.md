@@ -16,8 +16,8 @@ RecruitAIr_CriteriaEvaluator is a Natural Language Processing (NLP) model design
 The model ensures explainability by providing criterion-specific scores, which can later be aggregated (weighted averages) into overall applicant suitability rankings.
 
 - **Developed by:** Alfonso Brown (github: abrownglez (https://github.com/abrowng)), Tania González (github: taaniagonzaalez (https://github.com/taaniagonzaalez)), Virginia Nicosia (github: viiirgi(https://github.com/viiiiirgi)), Marc Parcerisa (github: AimboParce (https://github.com/AimbotParce)), Daniel Reverter (github: danirc2 (https://github.com/danirc2))
-- **Funded by [optional]:** Alfonso Brown, Tania González, Virginia Nicosia, Marc Parcerisa, Daniel Reverter
-- **Shared by [optional]:** Alfonso Brown, Tania González, Virginia Nicosia, Marc Parcerisa, Daniel Reverter
+- **Funded by:** Alfonso Brown, Tania González, Virginia Nicosia, Marc Parcerisa, Daniel Reverter
+- **Shared by:** Alfonso Brown, Tania González, Virginia Nicosia, Marc Parcerisa, Daniel Reverter
 - **Model type:** Machine Learning
 - **Language(s) (NLP):** English
 - **License:** apache-2.0
@@ -38,7 +38,7 @@ The model ensures explainability by providing criterion-specific scores, which c
 -   Producing criterion-level scores (e.g., Python proficiency = 0.9, AWS knowledge = 0.6).
 -   Supporting recruitment dashboards that show recruiters how applicants compare to requirements.
 
-### Downstream Use [optional]
+### Downstream Use 
 
 <!-- This section is for the model use when fine-tuned for a task, or when plugged into a larger ecosystem/app -->
 
@@ -81,7 +81,11 @@ Use the code below to get started with the model.
 
 <!-- This should link to a Dataset Card, perhaps with a short stub of information on what the training data is all about as well as documentation related to data pre-processing or additional filtering. -->
 
-{{ training_data | default("[More Information Needed]", true)}}
+Dataset card for job skills: https://github.com/mlops-2526q1-mds-upc/MLOps_RecruitAIr_CriteriaEvaluator/blob/main/reports/dataset_card_jobs.md
+
+Dataset card for recruitment: https://github.com/mlops-2526q1-mds-upc/MLOps_RecruitAIr_CriteriaEvaluator/blob/main/reports/dataset_card_recruitment.md
+
+
 
 ### Training Procedure
 
@@ -170,31 +174,9 @@ Carbon emissions can be estimated using the [Machine Learning Impact calculator]
 
 {{ software | default("[More Information Needed]", true)}}
 
-## Citation [optional]
+## Model Card Authors
 
-<!-- If there is a paper or blog post introducing the model, the APA and Bibtex information for that should go in this section. -->
-
-**BibTeX:**
-
-{{ citation_bibtex | default("[More Information Needed]", true)}}
-
-**APA:**
-
-{{ citation_apa | default("[More Information Needed]", true)}}
-
-## Glossary [optional]
-
-<!-- If relevant, include terms and calculations in this section that can help readers understand the model or model card. -->
-
-{{ glossary | default("[More Information Needed]", true)}}
-
-## More Information [optional]
-
-{{ more_information | default("[More Information Needed]", true)}}
-
-## Model Card Authors [optional]
-
-{{ model_card_authors | default("[More Information Needed]", true)}}
+Alfonso Brown, Tania González, Virginia Nicosia, Marc Parcerisa, Daniel Reverter
 
 ## Model Card Contact
 
