@@ -10,9 +10,7 @@ class ResumeAndCriteriaTokenizer:
         self.eos_token_id = pretrained_tokenizer.eos_token_id
         self.pad_token_id = pretrained_tokenizer.pad_token_id
 
-    def __call__(
-        self, resumes: List[str], criterias: List[str], resume_max_length: int = 512, criteria_max_length: int = 128
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+    def __call__(self, resumes: List[str], criterias: List[str]) -> Tuple[torch.Tensor, torch.Tensor]:
         """Tokenize resumes and criterias separately, then concatenate them with EOS in between and at the end."""
         # Join the resume and criteria tokens with "EOS" in between and at the end
         resume_tokens = list(map(lambda x: x + [self.eos_token_id], self.tokenizer(resumes)["input_ids"]))
