@@ -20,7 +20,11 @@ import re
 import sys
 from typing import List
 
-from recruitair.config.data_preprocess_config import INTERIM_DATA_DIR, RAW_DATA_DIR
+from recruitair.config.data_preprocess_config import (
+    INTERIM_DATA_DIR,
+    MAX_RESUME_LENGTH,
+    RAW_DATA_DIR,
+)
 
 FNAME_RE = re.compile(r"^(?P<label>match|mismatch)_(?P<num>\d+)\.json$", re.IGNORECASE)
 
@@ -45,6 +49,9 @@ def process_file(path: Path) -> List[dict]:
     resume = inp.get("resume", "").strip()
     if not resume:
         print(f"WARNING: No resume found in {path}", file=sys.stderr)
+        return []
+    if len(resume) > MAX_RESUME_LENGTH:
+        print(f"WARNING: Resume too long (> {MAX_RESUME_LENGTH} chars) in {path}", file=sys.stderr)
         return []
 
     scores = out.get("scores", {})

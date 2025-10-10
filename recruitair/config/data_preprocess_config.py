@@ -7,3 +7,4 @@ DATA_DIR = PROJ_ROOT / "data"
 INTERIM_DATA_DIR = DATA_DIR / "interim"
 PROCESSED_DATA_DIR = DATA_DIR / "processed"
 RAW_DATA_DIR = DATA_DIR / "raw"
+MAX_RESUME_LENGTH = 8000  # Maximum length for resumes to be processed
