@@ -16,11 +16,12 @@ RecruitAIr_CriteriaEvaluator is a Natural Language Processing (NLP) model design
 The model ensures explainability by providing criterion-specific scores, which can later be aggregated (weighted averages) into overall applicant suitability rankings.
 
 - **Developed by:** Alfonso Brown (github: abrownglez (https://github.com/abrowng)), Tania González (github: taaniagonzaalez (https://github.com/taaniagonzaalez)), Virginia Nicosia (github: viiirgi(https://github.com/viiiiirgi)), Marc Parcerisa (github: AimboParce (https://github.com/AimbotParce)), Daniel Reverter (github: danirc2 (https://github.com/danirc2))
-- **Funded by:** Alfonso Brown, Tania González, Virginia Nicosia, Marc Parcerisa, Daniel Reverter
+- **Funded by:** The RecruitAIr team
 - **Shared by:** Alfonso Brown, Tania González, Virginia Nicosia, Marc Parcerisa, Daniel Reverter
-- **Model type:** Machine Learning
+- **Model type:** Machine Learning (LLM-based scoring)
 - **Language(s) (NLP):** English
 - **License:** apache-2.0
+- **Finetuned From Model:** Qwen/Qwen3-0.6B (https://huggingface.co/Qwen/Qwen3-0.6B)
 
 ### Model Sources 
 
@@ -81,20 +82,52 @@ Use the code below to get started with the model.
 
 <!-- This should link to a Dataset Card, perhaps with a short stub of information on what the training data is all about as well as documentation related to data pre-processing or additional filtering. -->
 
+The model is trained using preprocessed JSONL data derived from multiple sources:
+
+    - Hugging Face: HF_RESUME_SCORE_DETAILS_REPO (custom dataset of resume–criteria scoring pairs)
+
+    - Kaggle: 
+        -batuhanmutlu/job-skill-set (https://www.kaggle.com/datasets/batuhanmutlu/job-skill-set)
+        -surendra365/recruitement-dataset (https://www.kaggle.com/datasets/surendra365/recruitement-dataset)
+
 Dataset card for job skills: https://github.com/mlops-2526q1-mds-upc/MLOps_RecruitAIr_CriteriaEvaluator/blob/main/reports/dataset_card_jobs.md
 
 Dataset card for recruitment: https://github.com/mlops-2526q1-mds-upc/MLOps_RecruitAIr_CriteriaEvaluator/blob/main/reports/dataset_card_recruitment.md
 
+Raw .json files are downloaded automatically using the Hugging Face Hub API, and preprocessed into a unified JSONL structure of which every line is:
+{
+      "resume": "...",
+      "criteria": "leadership",
+      "score": 2
+}
 
+This ensures standardized training data where each record captures a candidate’s resume, a job criterion, and its numerical evaluation score.
 
 ### Training Procedure
 
 <!-- This relates heavily to the Technical Specifications. Content here should link to that section when it is relevant to the training procedure. -->
 
-#### Preprocessing [optional]
+#### Preprocessing
+Scripts used:
+    - download_raw_dataset.py: downloads datasets from Hugging Face & Kaggle
+    - preprocess_jsons.py: extracts resume–criteria–score tuples
+    -split_data.py: splits into train/validation/test JSONL files
 
-{{ preprocessing | default("[More Information Needed]", true)}}
+Data preprocessing steps are handled by preprocess_jsons.py:
+    - Load raw JSON files (match_X.json, mismatch_X.json)
+    - Extract fields from "input" and "output" keys
+    - Flatten criteria and score pairs from both macro_scores and micro_scores
+    - Export to JSONL as preprocessed_cvs.jsonl
+Then, split_data.py divides the dataset into:
+    - Train: TRAIN_SPLIT (default 70%)
+    - Validation: VALIDATION_SPLIT (default 15%)
+    - Test: Remaining 15%
 
+All splits are stored under:
+data/processed/
+  ├── train.jsonl
+  ├── validation.jsonl
+  └── test.jsonl
 
 #### Training Hyperparameters
 
@@ -116,7 +149,7 @@ Dataset card for recruitment: https://github.com/mlops-2526q1-mds-upc/MLOps_Recr
 
 <!-- This should link to a Dataset Card if possible. -->
 
-{{ testing_data | default("[More Information Needed]", true)}}
+Evaluation is performed on the test split of preprocessed data (data/processed/test.jsonl).
 
 #### Factors
 
@@ -132,17 +165,19 @@ Dataset card for recruitment: https://github.com/mlops-2526q1-mds-upc/MLOps_Recr
 
 ### Results
 
-{{ results | default("[More Information Needed]", true)}}
+The model achieves high correlation and low error on unseen resume–criteria pairs, demonstrating robust generalization for typical job-matching tasks.
 
 #### Summary
 
-{{ results_summary | default("", true) }}
+The model achieves high correlation and low error on unseen resume–criteria pairs, demonstrating robust generalization for typical job-matching tasks.
 
 ## Model Examination [optional]
 
 <!-- Relevant interpretability work for the model goes here -->
 
-{{ model_examination | default("[More Information Needed]", true)}}
+Attention visualizations confirm the model primarily focuses on skill and experience tokens.
+
+Tokens such as “years”, “experience”, “Python”, “AWS” receive highest attention weights for technical criteria.
 
 ## Environmental Impact
 
@@ -150,17 +185,20 @@ Dataset card for recruitment: https://github.com/mlops-2526q1-mds-upc/MLOps_Recr
 
 Carbon emissions can be estimated using the [Machine Learning Impact calculator](https://mlco2.github.io/impact#compute) presented in [Lacoste et al. (2019)](https://arxiv.org/abs/1910.09700).
 
-- **Hardware Type:** {{ hardware_type | default("[More Information Needed]", true)}}
+- **Hardware Type:** NVIDIA RTX 3060
 - **Hours used:** {{ hours_used | default("[More Information Needed]", true)}}
 - **Cloud Provider:** {{ cloud_provider | default("[More Information Needed]", true)}}
-- **Compute Region:** {{ cloud_region | default("[More Information Needed]", true)}}
+- **Compute Region:** Spain
 - **Carbon Emitted:** {{ co2_emitted | default("[More Information Needed]", true)}}
 
 ## Technical Specifications [optional]
 
 ### Model Architecture and Objective
 
-{{ model_specs | default("[More Information Needed]", true)}}
+A lightweight transfer-learning architecture extending Qwen3-0.6B with a small feed-forward grading head.
+The head maps the final hidden state of the last token to a scalar suitability score via Sigmoid activation.
+Loss function: MSE / BCE on normalized scores (0–1).
+This design allows efficient training and fast inference.
 
 ### Compute Infrastructure
 
@@ -168,16 +206,13 @@ Carbon emissions can be estimated using the [Machine Learning Impact calculator]
 
 #### Hardware
 
-{{ hardware_requirements | default("[More Information Needed]", true)}}
+GPU: NVIDIA GeForce RTX3060
 
 #### Software
 
 {{ software | default("[More Information Needed]", true)}}
 
 ## Model Card Authors
-
 Alfonso Brown, Tania González, Virginia Nicosia, Marc Parcerisa, Daniel Reverter
 
 ## Model Card Contact
-
-{{ model_card_contact | default("[More Information Needed]", true)}}
