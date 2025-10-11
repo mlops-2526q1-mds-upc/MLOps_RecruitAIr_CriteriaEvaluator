@@ -7,9 +7,19 @@ name = "pytorch-cuda"
 url = "https://download.pytorch.org/whl/cu126"
 explicit = true
 
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
 [tool.uv.sources]
 torch = [
-  { index = "pytorch-cuda" },
+  { index = "pytorch-cpu", marker = "sys_platform != 'linux'" },
+  { index = "pytorch-cuda", marker = "sys_platform == 'linux'" },
+]
+torchvision = [
+  { index = "pytorch-cpu", marker = "sys_platform != 'linux'" },
+  { index = "pytorch-cuda", marker = "sys_platform == 'linux'" },
 ]
 
 [project]
@@ -44,6 +54,7 @@ dependencies = [
     "pip",
     "pylint>=3.3.9",
     "pynblint>=0.1.6",
+    "pytest>=8.4.2",
     "python-dotenv",
     "ruff>=0.13.3",
     "scikit-learn>=1.7.2",
