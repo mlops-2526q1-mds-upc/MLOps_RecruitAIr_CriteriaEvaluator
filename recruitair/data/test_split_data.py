@@ -36,21 +36,23 @@ def test_split_data(preprocessed_data_file: Path, tmp_path: Path):
     """
     processed_dir = tmp_path / "data" / "processed"
 
-    expected_train_rows = 70
+    total_rows = 100
+    train_split_ratio = 0.7
+    validation_split_ratio = 0.15
 
-    remaining_rows = 30
-    validation_on_remaining_ratio = 0.5
+    expected_train_rows = int(total_rows * train_split_ratio)  # 70
+
+    remaining_rows = total_rows - expected_train_rows  # 30
+    validation_on_remaining_ratio = validation_split_ratio / (1 - train_split_ratio)  # 0.15 / 0.3 = 0.5
     expected_validation_rows = int(remaining_rows * validation_on_remaining_ratio)  # 15
 
     expected_test_rows = remaining_rows - expected_validation_rows  # 15
 
-    with (
-        patch("recruitair.data.split_data.INTERIM_DATA_DIR", preprocessed_data_file),
-        patch("recruitair.data.split_data.PROCESSED_DATA_DIR", processed_dir),
-        patch("recruitair.data.split_data.TRAIN_SPLIT", 0.7),
-        patch("recruitair.data.split_data.VALIDATION_SPLIT", 0.15),
-        patch("recruitair.data.split_data.SEED", 42),
-    ):
+    with patch("recruitair.data.split_data.INTERIM_DATA_DIR", preprocessed_data_file), \
+            patch("recruitair.data.split_data.PROCESSED_DATA_DIR", processed_dir), \
+            patch("recruitair.data.split_data.TRAIN_SPLIT", train_split_ratio), \
+            patch("recruitair.data.split_data.VALIDATION_SPLIT", validation_split_ratio), \
+            patch("recruitair.data.split_data.SEED", 42):
         split_data()
 
     assert processed_dir.exists()
@@ -69,9 +71,9 @@ def test_split_data(preprocessed_data_file: Path, tmp_path: Path):
     assert len(train_df) == expected_train_rows
     assert len(validation_df) == expected_validation_rows
     assert len(test_df) == expected_test_rows
-    assert len(train_df) + len(validation_df) + len(test_df) == 100
+    assert len(train_df) + len(validation_df) + len(test_df) == total_rows
 
-    original_ids = set(range(100))
+    original_ids = set(range(total_rows))
     train_ids = set(train_df["id"])
     validation_ids = set(validation_df["id"])
     test_ids = set(test_df["id"])
