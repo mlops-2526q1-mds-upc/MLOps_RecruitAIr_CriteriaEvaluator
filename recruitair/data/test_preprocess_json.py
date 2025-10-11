@@ -1,4 +1,5 @@
 """Unit tests for preprocess json scripts."""
+
 # pylint: disable=W0621,C1803
 import json
 from pathlib import Path

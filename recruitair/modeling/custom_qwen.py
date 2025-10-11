@@ -1,4 +1,5 @@
 """The Qwen model."""
+
 import torch
 from torch import nn
 
@@ -7,6 +8,7 @@ class _GradingHead(nn.Module):
     """
     Defines the _GradingHead class for a grading mechanism in a neural network module.
     """
+
     def __init__(self, in_dim, hidden_dim=512, dropout=0.5):
         """
         Initializes the neural network module for binary classification tasks. The network
@@ -36,6 +38,7 @@ class CustomQwenModel(nn.Module):
     CustomQwenModel is a neural network model that combines a backbone and a head
     module to perform specific tasks.
     """
+
     def __init__(self, backbone: nn.Module, head: nn.Module):
         """
         Initializes the custom QwenModel.
@@ -69,7 +72,7 @@ def customize_qwen_model(
     backbone = next(original_model.children())
 
     # Create the grading head
-    in_dim = backbone.config.hidden_size # type: ignore
+    in_dim = backbone.config.hidden_size  # type: ignore
     head = _GradingHead(in_dim, hidden_dim=hidden_dim, dropout=dropout)
 
     # Combine backbone and head into a new model (ensure backbone is in float32)

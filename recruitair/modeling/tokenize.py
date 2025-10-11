@@ -1,4 +1,5 @@
 """The tokenizer for Resumes and their key criterias."""
+
 # pylint: disable=R0903
 from typing import List, Tuple
 
@@ -10,6 +11,7 @@ class ResumeAndCriteriaTokenizer:
     """
     Manages tokenization of resumes and criterias for NLP models.
     """
+
     def __init__(self, pretrained_tokenizer: PreTrainedTokenizer):
         """
         Initialize the tokenizer for Resumes and their key criterias.
