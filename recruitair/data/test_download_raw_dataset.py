@@ -1,10 +1,11 @@
 import os
+from pathlib import Path
 from unittest.mock import patch, MagicMock, call, ANY
 
 import pandas as pd
 import pytest
+from _pytest.capture import CaptureFixture
 from huggingface_hub.utils import HfHubHTTPError
-from more_itertools.more import side_effect
 
 from recruitair.data.download_raw_dataset import (
     download_kaggle_dataset,
@@ -15,7 +16,7 @@ from recruitair.data.download_raw_dataset import (
 @patch("recruitair.data.download_raw_dataset.os.makedirs")
 @patch("recruitair.data.download_raw_dataset.kagglehub")
 @patch("recruitair.data.download_raw_dataset.RAW_DATA_DIR", "mock/data/raw")
-def test_download_kaggle_dataset(mock_kagglehub, mock_makedirs):
+def test_download_kaggle_dataset(mock_kagglehub: MagicMock, mock_makedirs: MagicMock):
     """
     Test the download_kaggle_dataset function successfully downloads and saves data.
     """
@@ -37,7 +38,7 @@ def test_download_kaggle_dataset(mock_kagglehub, mock_makedirs):
 
 @patch("recruitair.data.download_raw_dataset.shutil.copy")
 @patch("recruitair.data.download_raw_dataset.hf_hub_download")
-def test_download_huggingface_dataset_success(mock_hf_download, mock_shutil_copy, tmp_path):
+def test_download_huggingface_dataset_success(mock_hf_download: MagicMock, mock_shutil_copy: MagicMock, tmp_path: Path):
     """
     Test successful download and copy of a single Hugging Face dataset file.
     """
@@ -58,7 +59,7 @@ def test_download_huggingface_dataset_success(mock_hf_download, mock_shutil_copy
 
 @patch("recruitair.data.download_raw_dataset.shutil.copy")
 @patch("recruitair.data.download_raw_dataset.hf_hub_download", side_effect=HfHubHTTPError("Download failed"))
-def test_download_huggingface_dataset_download_error(mock_hf_download, mock_shutil_copy, capsys, tmp_path):
+def test_download_huggingface_dataset_download_error(mock_hf_download: MagicMock, mock_shutil_copy: MagicMock, capsys: CaptureFixture, tmp_path: Path):
     """
     Test download_huggingface_dataset handles Hugging Face download errors.
     """
@@ -75,7 +76,7 @@ def test_download_huggingface_dataset_download_error(mock_hf_download, mock_shut
 
 @patch("recruitair.data.download_raw_dataset.hf_hub_download")
 @patch("recruitair.data.download_raw_dataset.shutil.copy", side_effect=PermissionError("Copy failed"))
-def test_download_huggingface_dataset_copy_error(mock_shutil_copy, mock_hf_download, capsys, tmp_path):
+def test_download_huggingface_dataset_copy_error(mock_shutil_copy: MagicMock, mock_hf_download: MagicMock, capsys: CaptureFixture, tmp_path: Path):
     """
     Test download_huggingface_dataset handles file copy errors.
     """
@@ -95,7 +96,7 @@ def test_download_huggingface_dataset_copy_error(mock_shutil_copy, mock_hf_downl
 @patch("recruitair.data.download_raw_dataset.download_huggingface_dataset")
 @patch("recruitair.data.download_raw_dataset.list_repo_files")
 @patch("recruitair.data.download_raw_dataset.os.makedirs")
-def test_download_huggingface_dataset_jsons_success(mock_makedirs, mock_list_files, mock_download_single, mock_open, tmp_path):
+def test_download_huggingface_dataset_jsons_success(mock_makedirs: MagicMock, mock_list_files: MagicMock, mock_download_single: MagicMock, mock_open: MagicMock, tmp_path: Path):
     """
     Test successful download of multiple JSON files from a Hugging Face repo.
     """
@@ -120,7 +121,7 @@ def test_download_huggingface_dataset_jsons_success(mock_makedirs, mock_list_fil
 
 
 @patch("recruitair.data.download_raw_dataset.list_repo_files", side_effect=Exception("API Error"))
-def test_download_huggingface_dataset_jsons_list_files_error(tmp_path):
+def test_download_huggingface_dataset_jsons_list_files_error(tmp_path: Path):
     """
     Test download_huggingface_dataset_jsons raises an error if listing files fails.
     """
@@ -130,7 +131,7 @@ def test_download_huggingface_dataset_jsons_list_files_error(tmp_path):
 
 @patch("recruitair.data.download_raw_dataset.download_huggingface_dataset")
 @patch("recruitair.data.download_raw_dataset.list_repo_files", return_value=["README.md", "data.csv"])
-def test_download_huggingface_dataset_jsons_no_json_files(mock_list_files, mock_download_single, capsys, tmp_path):
+def test_download_huggingface_dataset_jsons_no_json_files(mock_list_files: MagicMock, mock_download_single: MagicMock, capsys: CaptureFixture, tmp_path: Path):
     """
     Test download_huggingface_dataset_jsons handles repos with no JSON files.
     """
