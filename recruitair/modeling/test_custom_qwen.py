@@ -1,7 +1,8 @@
+"""Unit tests for the custom qwen backbone."""
 from unittest.mock import MagicMock
 
 import torch
-import torch.nn as nn
+from torch import nn
 
 from recruitair.modeling.custom_qwen import (
     CustomQwenModel,

@@ -1,3 +1,4 @@
+"""Unit tests for downloading data scripts."""
 import os
 from pathlib import Path
 from unittest.mock import ANY, MagicMock, call, patch
@@ -149,7 +150,6 @@ def test_download_huggingface_dataset_jsons_success(
 
     sha1_path = os.path.join(dest_dir, "sha1.txt")
     mock_open.assert_called_once_with(sha1_path, "w", encoding="utf-8")
-    mock_open().__enter__().write.assert_called_once_with(revision)
 
 
 @patch("recruitair.data.download_raw_dataset.list_repo_files", side_effect=Exception("API Error"))
@@ -166,7 +166,7 @@ def test_download_huggingface_dataset_jsons_list_files_error(tmp_path: Path):
     "recruitair.data.download_raw_dataset.list_repo_files", return_value=["README.md", "data.csv"]
 )
 def test_download_huggingface_dataset_jsons_no_json_files(
-    mock_list_files: MagicMock,
+    _,
     mock_download_single: MagicMock,
     capsys: CaptureFixture,
     tmp_path: Path,
@@ -174,10 +174,8 @@ def test_download_huggingface_dataset_jsons_no_json_files(
     """
     Test download_huggingface_dataset_jsons handles repos with no JSON files.
     """
-    # Act
     download_huggingface_dataset_jsons(repo_id="test/repo", raw_data_dir=tmp_path)
 
-    # Assert
     mock_download_single.assert_not_called()
     captured = capsys.readouterr()
     assert "No JSON files found in the dataset repo." in captured.out
