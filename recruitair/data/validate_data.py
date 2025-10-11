@@ -57,7 +57,10 @@ if __name__ == "__main__":
     suite.add_expectation(
         gx.expectations.ExpectColumnValueLengthsToBeBetween(
             meta={"name": "Max length of resumes"},
-            column="resume", min_value=1, max_value=MAX_RESUME_LENGTH, severity="warning"
+            column="resume",
+            min_value=1,
+            max_value=MAX_RESUME_LENGTH,
+            severity="warning",
         )
     )
     # Expectation 3: Score must be a numeric type
@@ -65,7 +68,8 @@ if __name__ == "__main__":
     suite.add_expectation(
         gx.expectations.ExpectColumnValuesToBeInTypeList(
             meta={"name": "Score types"},
-            column="score", type_list=["int", "float", "int64", "float64"]
+            column="score",
+            type_list=["int", "float", "int64", "float64"],
         )
     )
     # Expectation 4: Score must be within the defined range
@@ -73,7 +77,9 @@ if __name__ == "__main__":
     suite.add_expectation(
         gx.expectations.ExpectColumnValuesToBeBetween(
             meta={"name": "Score between range"},
-            column="score", min_value=MIN_SCORE, max_value=MAX_SCORE,
+            column="score",
+            min_value=MIN_SCORE,
+            max_value=MAX_SCORE,
         )
     )
     # Expectation 5: Objects must have a criteria
@@ -89,7 +95,10 @@ if __name__ == "__main__":
     suite.add_expectation(
         gx.expectations.ExpectColumnValueLengthsToBeBetween(
             meta={"name": "Max length of criteria"},
-            column="criteria", min_value=1, max_value=100, severity="warning"
+            column="criteria",
+            min_value=1,
+            max_value=100,
+            severity="warning",
         )
     )
 
@@ -122,7 +131,9 @@ if __name__ == "__main__":
                 continue
             print(f"-❌ {res.expectation_config.meta['name']}")
             print(f"Analyzed rows: {res.result['element_count']}")
-            print(f"Percentage of non-compliant data: {round(res.result['unexpected_percent'], 2)}%")
+            print(
+                f"Percentage of non-compliant data: {round(res.result['unexpected_percent'], 2)}%"
+            )
             print(f"Percentage of empty data: {round(res.result['missing_percent'], 2)}%")
             # print(f"Sample of failing data: {res.result['partial_unexpected_list']}")
             print("")
