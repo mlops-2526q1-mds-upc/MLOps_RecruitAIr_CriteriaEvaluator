@@ -1,4 +1,5 @@
 """Unit tests for the split data script."""
+
 # pylint: disable=R0914,W0621
 import json
 from pathlib import Path

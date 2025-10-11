@@ -1,4 +1,5 @@
 """Unit tests for downloading data scripts."""
+
 import os
 from pathlib import Path
 from unittest.mock import ANY, MagicMock, call, patch
