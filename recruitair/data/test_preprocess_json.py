@@ -2,8 +2,8 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
-import pytest
 from _pytest.capture import CaptureFixture
+import pytest
 
 from recruitair.data.preprocess_json import (
     find_target_json_files,
@@ -30,12 +30,14 @@ def test_find_target_json_files(tmp_path: Path):
     found_files = find_target_json_files(tmp_path)
 
     assert len(found_files) == 4
-    assert found_files == sorted([
-        tmp_path / "MATCH_3.json",
-        tmp_path / "match_1.json",
-        tmp_path / "mismatch_123.json",
-        sub_dir / "match_2.json",
-    ])
+    assert found_files == sorted(
+        [
+            tmp_path / "MATCH_3.json",
+            tmp_path / "match_1.json",
+            tmp_path / "mismatch_123.json",
+            sub_dir / "match_2.json",
+        ]
+    )
 
 
 def test_find_target_json_files_empty(tmp_path: Path):
@@ -119,7 +121,9 @@ def test_process_file_no_resume(tmp_path: Path, valid_json_content: dict, capsys
 
 
 @patch("recruitair.data.preprocess_json.MAX_RESUME_LENGTH", 10)
-def test_process_file_resume_too_long(tmp_path: Path, valid_json_content: dict, capsys: CaptureFixture):
+def test_process_file_resume_too_long(
+    tmp_path: Path, valid_json_content: dict, capsys: CaptureFixture
+):
     """
     Test process_file handles a resume that is too long.
     """

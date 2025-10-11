@@ -1,4 +1,4 @@
-from typing import Dict, List, Tuple
+from typing import List, Tuple
 
 import torch
 from transformers import PreTrainedTokenizer
@@ -10,11 +10,17 @@ class ResumeAndCriteriaTokenizer:
         self.eos_token_id = pretrained_tokenizer.eos_token_id
         self.pad_token_id = pretrained_tokenizer.pad_token_id
 
-    def __call__(self, resumes: List[str], criterias: List[str]) -> Tuple[torch.Tensor, torch.Tensor]:
+    def __call__(
+        self, resumes: List[str], criterias: List[str]
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
         """Tokenize resumes and criterias separately, then concatenate them with EOS in between and at the end."""
         # Join the resume and criteria tokens with "EOS" in between and at the end
-        resume_tokens = list(map(lambda x: x + [self.eos_token_id], self.tokenizer(resumes)["input_ids"]))
-        criteria_tokens = list(map(lambda x: x + [self.eos_token_id], self.tokenizer(criterias)["input_ids"]))
+        resume_tokens = list(
+            map(lambda x: x + [self.eos_token_id], self.tokenizer(resumes)["input_ids"])
+        )
+        criteria_tokens = list(
+            map(lambda x: x + [self.eos_token_id], self.tokenizer(criterias)["input_ids"])
+        )
         input_tokens = [r + c for r, c in zip(resume_tokens, criteria_tokens)]
         # Pad sequences to the same length with padding on the left, to have the leftmost token be the final EOS
         padded_input_tokens = torch.nn.utils.rnn.pad_sequence(

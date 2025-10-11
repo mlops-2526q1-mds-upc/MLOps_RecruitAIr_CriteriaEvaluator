@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-from transformers import AutoModelForCausalLM, AutoTokenizer
 
 
 class _GradingHead(nn.Module):
@@ -26,14 +25,18 @@ class CustomQwenModel(nn.Module):
 
     def forward(self, **inputs):
         backbone_outputs = self.backbone(**inputs)
-        last_hidden_state = backbone_outputs.last_hidden_state  # (batch_size, seq_len, hidden_size)
+        last_hidden_state = (
+            backbone_outputs.last_hidden_state
+        )  # (batch_size, seq_len, hidden_size)
         # Instead of passing the entire last hidden state, we can just use the representation of the last token
         last_hidden_state = last_hidden_state[:, -1, :]  # (batch_size, hidden_size)
         logits = self.head(last_hidden_state)  # (batch_size, 1)
         return logits
 
 
-def customize_qwen_model(original_model: nn.Module, hidden_dim=512, dropout=0.5) -> CustomQwenModel:
+def customize_qwen_model(
+    original_model: nn.Module, hidden_dim=512, dropout=0.5
+) -> CustomQwenModel:
     # Extract the backbone (all layers except the LM head)
     backbone = next(original_model.children())
 
