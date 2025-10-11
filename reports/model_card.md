@@ -125,11 +125,11 @@ Data was cleaned, normalized, tokenized with EOS separation, and split into trai
 
 #### Training Hyperparameters
 
-Training regime: bf16 mixed precision
-Optimizer: Adam
-Learning rate: 1e-4
-Batch size: 8
-Epochs: 4 <!--fp32, fp16 mixed precision, bf16 mixed precision, bf16 non-mixed precision, fp16 non-mixed precision, fp8 mixed precision -->
+- Training regime: bf16 mixed precision
+- Optimizer: Adam
+- Learning rate: 1e-4
+- Batch size: 8
+- Epochs: 4 <!--fp32, fp16 mixed precision, bf16 mixed precision, bf16 non-mixed precision, fp16 non-mixed precision, fp8 mixed precision -->
 
 ## Evaluation
 
@@ -198,17 +198,17 @@ Environment: CUDA 12.x, Python 3.10
 GPU: NVIDIA GeForce RTX3060
 
 #### Software
-Transformers
-PyTorch
-Scikit-learn
-Great Expectations
-Python 3.11
-ollama / langchain-ollama
-mlflow-genai
-pandas
-loguru
-typer
-tqdm
+- Transformers
+- PyTorch
+- Scikit-learn
+- Great Expectations
+- Python 3.11
+- ollama / langchain-ollama
+- mlflow-genai
+- pandas
+- loguru
+- typer
+- tqdm
 
 ## Model Card Authors
 Alfonso Brown, Tania González, Virginia Nicosia, Marc Parcerisa, Daniel Reverter
