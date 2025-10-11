@@ -75,7 +75,9 @@ def download_huggingface_dataset_jsons(
 
     print(f"Found {len(json_paths)} JSON files. Downloading...")
     num_downloaded = 0
-    for rel_path in tqdm(sorted(json_paths), desc="Downloading JSON files", unit="file", ncols=80, leave=False):
+    for rel_path in tqdm(
+        sorted(json_paths), desc="Downloading JSON files", unit="file", ncols=80, leave=False
+    ):
         downloaded = download_huggingface_dataset(
             repo_id=repo_id, rel_path=rel_path, revision=revision, dest_dir=dest_dir
         )
@@ -99,7 +101,9 @@ def download_huggingface_dataset(
     """Download a huggingface dataset and store it in a file."""
 
     try:
-        local_path = hf_hub_download(repo_id=repo_id, filename=rel_path, repo_type="dataset", revision=revision)
+        local_path = hf_hub_download(
+            repo_id=repo_id, filename=rel_path, repo_type="dataset", revision=revision
+        )
     except (HfHubHTTPError, ValueError, RequestException) as e:
         print(f"  - ERROR downloading {rel_path}: {e}")
         return False

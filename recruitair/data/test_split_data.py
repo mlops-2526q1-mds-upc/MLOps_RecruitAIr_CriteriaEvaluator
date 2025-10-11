@@ -40,16 +40,20 @@ def test_split_data(preprocessed_data_file: Path, tmp_path: Path):
     expected_train_rows = int(total_rows * train_split_ratio)  # 70
 
     remaining_rows = total_rows - expected_train_rows  # 30
-    validation_on_remaining_ratio = validation_split_ratio / (1 - train_split_ratio)  # 0.15 / 0.3 = 0.5
+    validation_on_remaining_ratio = validation_split_ratio / (
+        1 - train_split_ratio
+    )  # 0.15 / 0.3 = 0.5
     expected_validation_rows = int(remaining_rows * validation_on_remaining_ratio)  # 15
 
     expected_test_rows = remaining_rows - expected_validation_rows  # 15
 
-    with patch("recruitair.data.split_data.INTERIM_DATA_DIR", preprocessed_data_file), \
-            patch("recruitair.data.split_data.PROCESSED_DATA_DIR", processed_dir), \
-            patch("recruitair.data.split_data.TRAIN_SPLIT", train_split_ratio), \
-            patch("recruitair.data.split_data.VALIDATION_SPLIT", validation_split_ratio), \
-            patch("recruitair.data.split_data.SEED", 42):
+    with (
+        patch("recruitair.data.split_data.INTERIM_DATA_DIR", preprocessed_data_file),
+        patch("recruitair.data.split_data.PROCESSED_DATA_DIR", processed_dir),
+        patch("recruitair.data.split_data.TRAIN_SPLIT", train_split_ratio),
+        patch("recruitair.data.split_data.VALIDATION_SPLIT", validation_split_ratio),
+        patch("recruitair.data.split_data.SEED", 42),
+    ):
         split_data()
 
     assert processed_dir.exists()
