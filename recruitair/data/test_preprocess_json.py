@@ -1,3 +1,5 @@
+"""Unit tests for preprocess json scripts."""
+# pylint: disable=W0621,C1803
 import json
 from pathlib import Path
 from unittest.mock import patch
@@ -54,6 +56,7 @@ def test_find_target_json_files_empty(tmp_path: Path):
 
 @pytest.fixture
 def valid_json_content():
+    """Fixture for a valid json resume."""
     return {
         "input": {"resume": "This is the resume content."},
         "output": {

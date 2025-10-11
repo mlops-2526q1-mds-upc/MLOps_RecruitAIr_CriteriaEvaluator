@@ -1,9 +1,19 @@
+"""The Qwen model."""
 import torch
-import torch.nn as nn
+from torch import nn
 
 
 class _GradingHead(nn.Module):
+    """
+    Defines the _GradingHead class for a grading mechanism in a neural network module.
+    """
     def __init__(self, in_dim, hidden_dim=512, dropout=0.5):
+        """
+        Initializes the neural network module for binary classification tasks. The network
+        consists of a fully connected input layer, a hidden layer followed by a ReLU activation
+        function, a dropout layer for regularization, a fully connected output layer, and a
+        Sigmoid activation function to produce output probabilities.
+        """
         super().__init__()
         self.net = nn.Sequential(
             nn.Linear(in_dim, hidden_dim),
@@ -14,21 +24,36 @@ class _GradingHead(nn.Module):
         )
 
     def forward(self, x):
+        """
+        Defines the forward pass of the model, applying the defined network
+        to the input tensor.
+        """
         return self.net(x)
 
 
 class CustomQwenModel(nn.Module):
+    """
+    CustomQwenModel is a neural network model that combines a backbone and a head
+    module to perform specific tasks.
+    """
     def __init__(self, backbone: nn.Module, head: nn.Module):
+        """
+        Initializes the custom QwenModel.
+        """
         super().__init__()
         self.backbone = backbone
         self.head = head
 
     def forward(self, **inputs):
+        """
+        Computes the forward pass of the model using the provided inputs.
+        """
         backbone_outputs = self.backbone(**inputs)
         last_hidden_state = (
             backbone_outputs.last_hidden_state
         )  # (batch_size, seq_len, hidden_size)
-        # Instead of passing the entire last hidden state, we can just use the representation of the last token
+        # Instead of passing the entire last hidden state, we can just use
+        # the representation of the last token
         last_hidden_state = last_hidden_state[:, -1, :]  # (batch_size, hidden_size)
         logits = self.head(last_hidden_state)  # (batch_size, 1)
         return logits
@@ -37,11 +62,14 @@ class CustomQwenModel(nn.Module):
 def customize_qwen_model(
     original_model: nn.Module, hidden_dim=512, dropout=0.5
 ) -> CustomQwenModel:
+    """
+    Customizes the Qwen model with a custom head.
+    """
     # Extract the backbone (all layers except the LM head)
     backbone = next(original_model.children())
 
     # Create the grading head
-    in_dim = backbone.config.hidden_size
+    in_dim = backbone.config.hidden_size # type: ignore
     head = _GradingHead(in_dim, hidden_dim=hidden_dim, dropout=dropout)
 
     # Combine backbone and head into a new model (ensure backbone is in float32)
@@ -51,6 +79,9 @@ def customize_qwen_model(
 
 
 def freeze_custom_qwen_backbone(model: CustomQwenModel):
+    """
+    Freezes the Qwen backbone.
+    """
     for param in model.backbone.parameters():
         param.requires_grad = False
 
