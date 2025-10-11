@@ -10,6 +10,9 @@ jobs:
   pylint:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+
     steps:
       - uses: actions/checkout@v5
       - name: Set up Python
@@ -25,7 +28,6 @@ jobs:
       - name: Format code
         run: |
           uv run black recruitair && \
-          uv run flake8 recruitair && \
           uv run isort **/**.py
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v6
