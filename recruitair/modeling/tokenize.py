@@ -4,7 +4,7 @@
 from typing import List, Tuple
 
 import torch
-from transformers import BatchEncoding, PreTrainedTokenizer
+from transformers import AutoTokenizer, BatchEncoding, PreTrainedTokenizer
 
 
 class ResumeAndCriteriaTokenizer:
@@ -23,8 +23,8 @@ class ResumeAndCriteriaTokenizer:
 
     def __call__(
         self,
-        resumes: List[str],
-        criterias: List[str],
+        resumes: List[str] | str,
+        criterias: List[str] | str,
         padding: bool = False,
         padding_side: str = "right",
         return_tensors: str = "pt",
@@ -33,6 +33,10 @@ class ResumeAndCriteriaTokenizer:
         Tokenize resumes and criterias separately, then concatenate them with
         EOS in between and at the end.
         """
+        if isinstance(resumes, str):
+            resumes = [resumes]
+        if isinstance(criterias, str):
+            criterias = [criterias]
         if len(resumes) != len(criterias):
             raise ValueError("The number of resumes must match the number of criterias.")
 
@@ -55,5 +59,5 @@ class ResumeAndCriteriaTokenizer:
         """
         Load a pretrained tokenizer from a model name or path.
         """
-        tokenizer = PreTrainedTokenizer.from_pretrained(pretrained_model_name_or_path)
+        tokenizer = AutoTokenizer.from_pretrained(pretrained_model_name_or_path)
         return cls(tokenizer)
