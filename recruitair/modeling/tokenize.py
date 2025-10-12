@@ -41,7 +41,8 @@ class ResumeAndCriteriaTokenizer:
             raise ValueError("The number of resumes must match the number of criterias.")
 
         input_texts = [
-            f"{resume}{self.eos_token}{criteria}{self.eos_token}" for resume, criteria in zip(resumes, criterias)
+            f"{resume}{self.eos_token}{criteria}{self.eos_token}"
+            for resume, criteria in zip(resumes, criterias)
         ]
         encoded_inputs = self.tokenizer(
             input_texts, padding=padding, return_tensors=return_tensors, padding_side=padding_side
