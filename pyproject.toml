@@ -38,6 +38,7 @@ classifiers = [
 dependencies = [
     "accelerate>=1.10.1",
     "black",
+    "codecarbon>=2.7.1",
     "dagshub>=0.6.3",
     "dvc>=3.63.0",
     "dvc-s3>=3.2.2",
