@@ -20,20 +20,14 @@ class ResumeAndCriteriaTokenizer:
         self.eos_token_id = pretrained_tokenizer.eos_token_id
         self.pad_token_id = pretrained_tokenizer.pad_token_id
 
-    def __call__(
-        self, resumes: List[str], criterias: List[str]
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+    def __call__(self, resumes: List[str], criterias: List[str]) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Tokenize resumes and criterias separately, then concatenate them with
         EOS in between and at the end.
         """
         # Join the resume and criteria tokens with "EOS" in between and at the end
-        resume_tokens = list(
-            map(lambda x: x + [self.eos_token_id], self.tokenizer(resumes)["input_ids"])
-        )
-        criteria_tokens = list(
-            map(lambda x: x + [self.eos_token_id], self.tokenizer(criterias)["input_ids"])
-        )
+        resume_tokens = list(map(lambda x: x + [self.eos_token_id], self.tokenizer(resumes)["input_ids"]))
+        criteria_tokens = list(map(lambda x: x + [self.eos_token_id], self.tokenizer(criterias)["input_ids"]))
         input_tokens = [r + c for r, c in zip(resume_tokens, criteria_tokens)]
         # Pad sequences to the same length with padding on the left, to have the
         #  leftmost token be the final EOS
@@ -46,3 +40,17 @@ class ResumeAndCriteriaTokenizer:
         # Compute attention mask (1 for real tokens, 0 for padding)
         attention_mask = (padded_input_tokens != self.pad_token_id).long()
         return padded_input_tokens, attention_mask
+
+    def save_pretrained(self, save_directory: str):
+        """
+        Save the tokenizer to a directory.
+        """
+        self.tokenizer.save_pretrained(save_directory)
+
+    @classmethod
+    def from_pretrained(cls, pretrained_model_name_or_path: str):
+        """
+        Load a pretrained tokenizer from a model name or path.
+        """
+        tokenizer = PreTrainedTokenizer.from_pretrained(pretrained_model_name_or_path)
+        return cls(tokenizer)
