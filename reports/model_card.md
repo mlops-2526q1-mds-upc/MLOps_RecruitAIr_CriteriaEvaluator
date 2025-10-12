@@ -73,26 +73,35 @@ Recruiters should use this model as a decision support tool, not a final hiring 
 Use the code below to get started with the model.
 
 ```python
-from transformers import AutoTokenizer, AutoModelForCausalLM
-from recruitair.modeling.custom_qwen import customize_qwen_model, freeze_custom_qwen_backbone
-from recruitair.modeling.tokenize import ResumeAndCriteriaTokenizer
+import os
 import torch
+import mlflow
+from tempfile import TemporaryDirectory
+from recruitair.modeling.tokenize import ResumeAndCriteriaTokenizer
 
-model_name = "Qwen/Qwen3-0.6B"
-base_model = AutoModelForCausalLM.from_pretrained(model_name)
-tokenizer = AutoTokenizer.from_pretrained(model_name)
+mlflow.set_tracking_uri("http://nattech.fib.upc.edu:40380/")
 
-model = customize_qwen_model(base_model)
-freeze_custom_qwen_backbone(model)
+MODEL_NAME = "criteria-evaluation"
+VERSION = 2
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
+# Load pre-trained model
+model = mlflow.pytorch.load_model(model_uri=f"models:/{MODEL_NAME}/{VERSION}", map_location=device)
+model.eval()
+
+# Load pre-trained tokenizer
+with TemporaryDirectory() as tmpdirname:
+    mlflow.artifacts.download_artifacts(artifact_uri=f"models:/{MODEL_NAME}/{VERSION}", dst_path=tmpdirname)
+    tokenizer = ResumeAndCriteriaTokenizer.from_pretrained(os.path.join(tmpdirname, "extra_files", "tokenizer"))
 
 resume = "Senior Data Scientist with 5 years of experience in NLP and ML..."
 criteria = "Experience with deep learning and Python"
 
-rc_tokenizer = ResumeAndCriteriaTokenizer(tokenizer)
-inputs, mask = rc_tokenizer([resume], [criteria])
+encoded_input = tokenizer(resume, criteria).to(device)
 
 with torch.no_grad():
-    score = model(input_ids=inputs, attention_mask=mask)
+    score = model(**encoded_input)
 print(f"Compatibility score: {score.item():.3f}")
 ```
 
