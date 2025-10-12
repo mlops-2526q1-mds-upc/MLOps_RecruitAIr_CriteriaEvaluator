@@ -14,12 +14,14 @@ explicit = true
 
 [tool.uv.sources]
 torch = [
-  { index = "pytorch-cpu", marker = "sys_platform != 'linux'" },
+  { index = "pytorch-cuda", marker = "sys_platform == 'win32'" },
   { index = "pytorch-cuda", marker = "sys_platform == 'linux'" },
+  { index = "pytorch-cpu", marker = "sys_platform == 'darwin'" },
 ]
 torchvision = [
-  { index = "pytorch-cpu", marker = "sys_platform != 'linux'" },
+  { index = "pytorch-cuda", marker = "sys_platform == 'win32'" },
   { index = "pytorch-cuda", marker = "sys_platform == 'linux'" },
+  { index = "pytorch-cpu", marker = "sys_platform == 'darwin'" },
 ]
 
 [project]
@@ -38,7 +40,7 @@ classifiers = [
 dependencies = [
     "accelerate>=1.10.1",
     "black",
-    "codecarbon>=2.7.1",
+    "codecarbon>=3.0.6",
     "dagshub>=0.6.3",
     "dvc>=3.63.0",
     "dvc-s3>=3.2.2",
@@ -49,7 +51,7 @@ dependencies = [
     "kagglehub>=0.3.13",
     "langchain-ollama>=0.3.10",
     "loguru",
-    "mlflow>=3.4.0",
+    "mlflow>=3.3.2",
     "mypy>=1.18.2",
     "pandas-stubs>=2.3.2.250926",
     "pip",
