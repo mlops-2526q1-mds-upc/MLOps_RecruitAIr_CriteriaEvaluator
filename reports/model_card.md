@@ -129,11 +129,15 @@ Data was cleaned, normalized, tokenized with EOS separation, and split into trai
 
 #### Training Hyperparameters
 
+- BAse model: Qwen/Qwen3-0.6B
 - Training regime: bf16 mixed precision
 - Optimizer: Adam
-- Learning rate: 1e-4
+- Learning rate: 1e-3
+- Weight decay: 1e-4
 - Batch size: 8
-- Epochs: 4 <!--fp32, fp16 mixed precision, bf16 mixed precision, bf16 non-mixed precision, fp16 non-mixed precision, fp8 mixed precision -->
+- Epochs: 1
+- Loss Function: Mean Squared Error (MSELoss)
+ <!--fp32, fp16 mixed precision, bf16 mixed precision, bf16 non-mixed precision, fp16 non-mixed precision, fp8 mixed precision -->
 
 ## Evaluation
 
@@ -156,17 +160,18 @@ Evaluation considered job domain, posting length, and skill diversity.
 #### Metrics
 
 <!-- These are the evaluation metrics being used, ideally with a description of why. -->
-We plan to evaluate model quality using:
-- Mean Squared Error (MSE) to measuree how close predicted scores are to human (ground truth) scores.
-- Pearson correlation coefficient to measure linear correlation between predicted and human scores (captures rank/order similarity).
-- ROC-AUC for binary matching threshold because if you threshold scores (e.g., “match” vs “no match”), AUC tells you how well the model separates them..
+We plan to evaluate model quality using the Mean Squared Error (MSE) to measuree how close predicted scores are to human (ground truth) scores.
 ### Results
 
-Model training and evaluation are in progress. Results will be reported in the next delivery.
-
+Fine-tuning completed successfully on the Qwen/Qwen3-0.6B base model. 
+- Training Loss (MSE): 0.00054
+- Validation Loss (MSE): 0.00358
+- Epoch Duration: 2.59 s
+- Validation Duration: 3.56 s
+- Total Training Duration: 8.36 s
 #### Summary
 
-Planned evaluation aims to assess both numeric accuracy (MSE) and human-alignment (correlation). Results pending.
+The model achieved very low MSE values on both training and validation, suggesting stable learning and no major overfitting.
 
 ## Model Examination 
 
@@ -178,13 +183,17 @@ Model interpretability and attention visualization are planned for later milesto
 
 <!-- Total emissions (in grams of CO2eq) and additional considerations, such as electricity usage, go here. Edit the suggested text below accordingly -->
 
-Carbon emissions can be estimated using the Codecarbon
+Carbon emissions were estimated using CodeCarbon
 
-- **Hardware Type:** NVIDIA RTX 3060
-- **Hours used:** {{ hours_used | default("[More Information Needed]", true)}}
-- **Cloud Provider:** {{ cloud_provider | default("[More Information Needed]", true)}}
-- **Compute Region:** Spain
-- **Carbon Emitted:** {{ co2_emitted | default("[More Information Needed]", true)}}
+- **Hardware Type:** NVIDIA RTX 3060 (1 GPU) + 32 CPU cores + 61.6 GB RAM
+- **Duration:** ~7.16s
+- **Execution Type:** Local workstation
+- **Compute Region:** Spain (approx. 41.442 N, 2.171 E)
+- **Electricity Usage:** ~0.00566 kWh total (CPU ≈ 0.00540 kWh, GPU ≈ 0.00024 kWh, RAM ≈ 0.00002 kWh)
+- **Carbon Emitted:** ≈ 0.000985 kg CO₂ eq (≈ 0.99 g CO₂ eq)
+- **Power Usage Effectiveness (PUE):** 1 
+
+This experiment consumed roughly 5.66 Wh of electricity, producing less than 1 g of CO₂ eq: a minimal footprint.
 
 ## Technical Specifications
 
@@ -199,7 +208,9 @@ Framework: PyTorch + Transformers
 Environment: CUDA 12.x, Python 3.10
 
 #### Hardware
-GPU: NVIDIA GeForce RTX3060
+- GPU: NVIDIA GeForce RTX3060
+- CPU: 32 cores
+- RAM 61.6 GB 
 
 #### Software
 - Transformers
