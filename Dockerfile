@@ -1,12 +1,14 @@
+# Dockerfile (CPU)
 FROM python:3.11-slim
 
-WORKDIR /recruitair/api_evaluator
+WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements_api.txt .
+RUN pip install --no-cache-dir -r requirements_api.txt
 
-COPY api_evaluator ./recruitair/api_evaluator
+# Copy only the package code (faster builds)
+COPY recruitair ./recruitair
 
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--ws-max-size", "16777216"]
+CMD ["uvicorn", "recruitair.api_evaluator.main:app", "--host", "0.0.0.0", "--port", "8000"]
