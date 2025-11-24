@@ -2,6 +2,7 @@ from functools import lru_cache
 from .config import settings
 from .model import DummyEvaluator, TorchMLflowEvaluator, BaseEvaluatorModel
 
+
 @lru_cache(maxsize=1)
 def get_default_model() -> BaseEvaluatorModel:
     """
