@@ -70,3 +70,73 @@ stages:
       hash: md5
       md5: 39320c5f8b859f1ba09bfd7185902c7d
       size: 2941563
+  download-raw-dataset:
+    cmd: uv run python -m recruitair.data.download_raw_dataset
+    deps:
+    - path: recruitair/config/data_download_config.py
+      hash: md5
+      md5: 5aa5f9ebe39820027171fea05daa0334
+      size: 348
+    - path: recruitair/data/download_raw_dataset.py
+      hash: md5
+      md5: fcb59b245005abace2c577eb72413b2f
+      size: 4287
+    outs:
+    - path: data/raw/job-skill-set.csv
+      hash: md5
+      md5: 91aae8929ba2216f5f7df451583e5b7c
+      size: 4910232
+    - path: data/raw/raw_jsons/
+      hash: md5
+      md5: d93d60248b2ec8721ebe15a333535407.dir
+      size: 13682579
+      nfiles: 1032
+    - path: data/raw/recruitment.csv
+      hash: md5
+      md5: 5e02647bac4970269470190ad4978148
+      size: 10156046
+  preprocess-json:
+    cmd: uv run python -m recruitair.data.preprocess_json
+    deps:
+    - path: data/raw/raw_jsons/
+      hash: md5
+      md5: d93d60248b2ec8721ebe15a333535407.dir
+      size: 13682579
+      nfiles: 1032
+    - path: recruitair/config/data_preprocess_config.py
+      hash: md5
+      md5: 52591e074efb8e671ed78f81b622d969
+      size: 328
+    - path: recruitair/data/preprocess_json.py
+      hash: md5
+      md5: a051996a993ecb32c7f432fef4e44d43
+      size: 3827
+    outs:
+    - path: data/interim/preprocessed_cvs.jsonl
+      hash: md5
+      md5: b13daf03a2a7295549966bf3dae609bb
+      size: 14795944
+  split-data:
+    cmd: uv run python -m recruitair.data.split_data
+    deps:
+    - path: data/interim/preprocessed_cvs.jsonl
+      hash: md5
+      md5: b13daf03a2a7295549966bf3dae609bb
+      size: 14795944
+    - path: recruitair/config/data_split_config.py
+      hash: md5
+      md5: 666960ec6178704c1914b6f6617e8a05
+      size: 251
+    outs:
+    - path: data/processed/test.jsonl
+      hash: md5
+      md5: 2582712aa14bc83339f3db801f3bc0e7
+      size: 1491348
+    - path: data/processed/train.jsonl
+      hash: md5
+      md5: 1d48005b4bb8dcb5b286568bcf694939
+      size: 10369889
+    - path: data/processed/validation.jsonl
+      hash: md5
+      md5: 39320c5f8b859f1ba09bfd7185902c7d
+      size: 2941563
