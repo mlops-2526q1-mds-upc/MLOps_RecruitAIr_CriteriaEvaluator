@@ -1,8 +1,9 @@
 # recruitair/api_evaluator/tests/test_api.py
 from fastapi.testclient import TestClient
 import pytest
-from recruitair.api.main import app
-from recruitair.api.model import BaseEvaluatorModel
+
+from recruitair.api_evaluator.main import app
+from recruitair.api_evaluator.model import BaseEvaluatorModel
 
 
 class MockModel(BaseEvaluatorModel):
