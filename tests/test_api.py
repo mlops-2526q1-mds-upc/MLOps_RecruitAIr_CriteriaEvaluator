@@ -1,6 +1,7 @@
 # recruitair/api_evaluator/tests/test_api.py
 from fastapi.testclient import TestClient
 import pytest
+
 from recruitair.api_evaluator.main import app
 from recruitair.api_evaluator.model import BaseEvaluatorModel
 
@@ -23,10 +24,9 @@ class MockModel(BaseEvaluatorModel):
 
 @pytest.fixture(autouse=True)
 def override_model(monkeypatch):
-    from recruitair.api_evaluator.dependencies import get_default_model
-
     # override the cached dependency to return our mock
     import recruitair.api_evaluator.dependencies as deps_mod
+    from recruitair.api_evaluator.dependencies import get_default_model
 
     deps_mod.get_default_model.cache_clear()
     deps_mod.get_default_model = lambda: MockModel()
