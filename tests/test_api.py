@@ -1,9 +1,10 @@
-# recruitair/api_evaluator/tests/test_api.py
+# /tests/test_api.py
 from fastapi.testclient import TestClient
 import pytest
 
-from recruitair.api_evaluator.main import app
-from recruitair.api_evaluator.model import BaseEvaluatorModel
+from recruitair.api.dependencies import get_default_model
+from recruitair.api.main import app
+from recruitair.api.model import BaseEvaluatorModel
 
 
 class MockModel(BaseEvaluatorModel):
@@ -22,24 +23,16 @@ class MockModel(BaseEvaluatorModel):
         return 0.5
 
 
-@pytest.fixture(autouse=True)
-def override_model(monkeypatch):
-    # override the cached dependency to return our mock
-    import recruitair.api.dependencies as deps_mod
-    from recruitair.api.dependencies import get_default_model
-
-    deps_mod.get_default_model.cache_clear()
-    deps_mod.get_default_model = lambda: MockModel()
-    yield
-    # clear override
-    try:
-        deps_mod.get_default_model.cache_clear()
-    except Exception:
-        pass
+app.dependency_overrides[get_default_model] = lambda: MockModel()
 
 
-def test_eval_python_match():
-    client = TestClient(app)
+@pytest.fixture(scope="module")
+def client():
+    with TestClient(app) as c:
+        yield c
+
+
+def test_eval_python_match(client: TestClient):
     req = {
         "criteria_description": "Experience with Python and ML",
         "applicant_cv": "Skilled in Python",
@@ -51,20 +44,17 @@ def test_eval_python_match():
     assert data["model_version"] == "mock-1"
 
 
-def test_eval_empty_cv_or_criteria():
-    client = TestClient(app)
+def test_eval_empty_cv_or_criteria(client: TestClient):
     req1 = {"criteria_description": "Python", "applicant_cv": ""}
     r1 = client.post("/eval", json=req1)
-    assert r1.status_code == 200
-    assert r1.json()["score"] == 0.0
+    assert r1.status_code == 422
 
     req2 = {"criteria_description": "", "applicant_cv": "Some text"}
     r2 = client.post("/eval", json=req2)
     assert r2.status_code == 422
 
 
-def test_health():
-    client = TestClient(app)
+def test_health(client: TestClient):
     r = client.get("/health")
     assert r.status_code == 200
     assert r.json() == {"status": "ok"}

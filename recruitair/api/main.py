@@ -1,11 +1,12 @@
-import time
 import logging
-from fastapi import FastAPI, HTTPException, Depends
+import time
+
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from .schemas import EvalRequest, EvalResponse
 from .dependencies import get_default_model
 from .model import BaseEvaluatorModel
+from .schemas import EvalRequest, EvalResponse
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -29,9 +30,7 @@ def evaluate(request: EvalRequest, model: BaseEvaluatorModel = Depends(get_defau
         logger.exception("Model prediction failed: %s", exc)
         raise HTTPException(status_code=500, detail="Model prediction failed")
     elapsed = time.time() - t0
-    return EvalResponse(
-        score=score, model_version=getattr(model, "version", None), elapsed_seconds=elapsed
-    )
+    return EvalResponse(score=score, model_version=getattr(model, "version", None), elapsed_seconds=elapsed)
 
 
 @app.get("/health")
