@@ -221,7 +221,6 @@ Environment: CUDA 12.x, Python 3.10
 - ollama / langchain-ollama
 - mlflow-genai
 - pandas
-- loguru
 - typer
 - tqdm
 
