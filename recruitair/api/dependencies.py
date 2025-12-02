@@ -7,10 +7,7 @@ from .model import BaseEvaluatorModel, DummyEvaluator, TorchMLflowEvaluator
 @lru_cache()
 def get_default_model() -> BaseEvaluatorModel:
     return TorchMLflowEvaluator(
-        model_uri=settings.model_uri,
+        model_uri=f"models:/{settings.model}/{settings.model_version}",
         device=settings.device,
     )
-    # return DummyEvaluator()
-    # return DummyEvaluator()
-    # return DummyEvaluator()
     # return DummyEvaluator()

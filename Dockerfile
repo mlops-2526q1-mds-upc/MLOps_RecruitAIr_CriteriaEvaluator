@@ -42,6 +42,9 @@ RUN --mount=type=bind,from=docker.io/astral/uv:latest,source=/uv,target=/bin/uv 
     --mount=type=cache,target=/root/.cache/pip \
     uv export --locked --no-dev | pip install -r /dev/stdin
 
+# Grant ownership of the application code to the non-privileged user.
+RUN chown -R appuser:appuser /app
+
 # Switch to the non-privileged user to run the application.
 USER appuser
 
