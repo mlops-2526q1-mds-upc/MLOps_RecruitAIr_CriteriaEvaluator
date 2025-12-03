@@ -74,7 +74,7 @@ import mlflow
 from tempfile import TemporaryDirectory
 from recruitair.modeling.tokenize import ResumeAndCriteriaTokenizer
 
-mlflow.set_tracking_uri("http://nattech.fib.upc.edu:40380/")
+mlflow.set_tracking_uri("https://ml-4cb370e118ec407c83eed254868ebce1.ecs.eu-north-1.on.aws")
 
 MODEL_NAME = "criteria-evaluation"
 VERSION = 2
