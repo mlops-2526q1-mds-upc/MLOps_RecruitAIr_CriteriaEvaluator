@@ -1,13 +1,19 @@
+import os
+from typing import Literal, Optional
+
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="RECRUITAIR_")
-
-    model: str = "criteria-evaluation"  # default MLflow model URI; override via env
-    model_version: str = "2"  # or specify a version like "1"
-    # Don't forget to set MLFLOW_ARTIFACT_URI env var if needed
-    device: str | None = None  # "cuda" or "cpu" or None to auto-select
+    # Don't forget to set MLFLOW_TRACKING_URI in your environment variables
+    model: str = Field("criteria-evaluation", description="default MLflow model URI; override via env")
+    model_version: str = Field("latest", description="Model version to load")
+    device: Literal["cuda", "cpu", None] = Field(None, description='"cuda" or "cpu" or None to auto-select')
 
 
 settings = Settings()
+
+if not os.getenv("MLFLOW_TRACKING_URI"):
+    raise EnvironmentError("Please set the MLFLOW_TRACKING_URI environment variable.")
