@@ -47,5 +47,5 @@ jobs:
           tags: |
             ghcr.io/${{ steps.lower-repo.outputs.repository_owner }}/recruitair/evaluator-api:${{ steps.remove-v.outputs.tag }}
             ghcr.io/${{ steps.lower-repo.outputs.repository_owner }}/recruitair/evaluator-api:latest
-          cache-from: type=registry,ref=ghcr.io/${{ steps.lower-repo.outputs.repository_owner }}/recruitair/evaluator-api:${{ steps.remove-v.outputs.tag }}
+          cache-from: type=registry,ref=ghcr.io/${{ steps.lower-repo.outputs.repository_owner }}/recruitair/evaluator-api:latest
           cache-to: type=inline
