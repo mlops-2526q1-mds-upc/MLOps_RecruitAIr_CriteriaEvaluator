@@ -2,7 +2,7 @@
 from fastapi.testclient import TestClient
 import pytest
 
-from recruitair.api.dependencies import get_default_model
+from recruitair.api.dependencies import get_model
 from recruitair.api.main import app
 from recruitair.api.model import BaseEvaluatorModel
 
@@ -23,7 +23,7 @@ class MockModel(BaseEvaluatorModel):
         return 0.5
 
 
-app.dependency_overrides[get_default_model] = lambda: MockModel()
+app.dependency_overrides[get_model] = lambda: MockModel()
 
 
 @pytest.fixture(scope="module")
