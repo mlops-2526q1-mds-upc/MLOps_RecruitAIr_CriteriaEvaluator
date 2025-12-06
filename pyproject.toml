@@ -48,6 +48,7 @@ dependencies = [
     "transformers>=4.57.0",
     "types-tqdm>=4.67.0.20250809",
     "uvicorn>=0.37.0",
+    "prometheus-client>=0.20.0",
 ]
 requires-python = "~=3.11.0"
 
