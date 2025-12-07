@@ -22,6 +22,7 @@ services:
     #   - "9090:9090"
       # Uncomment the above line to expose Prometheus UI if needed (by default, use grafana to visualize)
     volumes:
+      - prometheus-data:/prometheus
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
     depends_on:
       - evaluator-api
@@ -45,4 +46,5 @@ services:
 
 volumes:
   grafana-storage:
+  prometheus-data:
   evaluator-cache:
