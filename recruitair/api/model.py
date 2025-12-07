@@ -11,7 +11,7 @@ import torch
 
 from recruitair.modeling.tokenize import ResumeAndCriteriaTokenizer
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("uvicorn.error")
 
 
 class BaseEvaluatorModel:
@@ -90,9 +90,12 @@ class TorchMLflowEvaluator(BaseEvaluatorModel):
             return res
         return None
 
-    def _load(self):
-        t0 = time.time()
-        # load model via mlflow
+    def _load_model(self) -> float:
+        """
+        Load the model from MLflow.
+        Returns the time taken to load the model in seconds.
+        """
+        t0 = time.monotonic()
         logger.info("Loading model from mlflow uri=%s", self.model_uri)
         if self.cache_dir:
             model_dir = os.path.join(self.cache_dir, "model")
@@ -110,9 +113,16 @@ class TorchMLflowEvaluator(BaseEvaluatorModel):
         else:
             # mlflow.pytorch.load_model will return the model (same approach used in your notebook)
             self._model = mlflow.pytorch.load_model(model_uri=self.model_uri, map_location=self._device)
-        # try to fetch model version from uri or model metadata
-        self._version = self.model_uri
+        logger.info("Model loaded from %s", self.model_uri)
+        return time.monotonic() - t0
 
+    def _load_tokenizer(self):
+        """
+        Load the tokenizer from MLflow artifacts.
+
+        Returns the time taken to load the tokenizer in seconds.
+        """
+        t0 = time.time()
         # fetch tokenizer extra_files/artifacts the training logged
         if not self.cache_dir:
             tmpdir = TemporaryDirectory()
@@ -137,39 +147,24 @@ class TorchMLflowEvaluator(BaseEvaluatorModel):
                 logger.info("Loading tokenizer from cache directory: %s", tokenizer_dir)
 
         try:
-            # your training saved the tokenizer under extra_files/tokenizer or a tokenizer dir
-            # try common candidate locations
-            cand = [
-                os.path.join(tokenizer_dir, "tokenizer"),
+            self._tokenizer = ResumeAndCriteriaTokenizer.from_pretrained(
                 os.path.join(tokenizer_dir, "extra_files", "tokenizer"),
-                os.path.join(tokenizer_dir, "extra", "tokenizer"),
-            ]
-            discovered_tokenizer_dir: str = None
-            for c in cand:
-                if os.path.isdir(c):
-                    discovered_tokenizer_dir = c
-                    break
-            if discovered_tokenizer_dir is None:
-                # sometimes mlflow stores tokenizer inside model artifact folder
-                # try to find any folder containing "tokenizer" substring
-                for root, dirs, _ in os.walk(discovered_tokenizer_dir):
-                    for d in dirs:
-                        if "tokenizer" in d.lower():
-                            discovered_tokenizer_dir = os.path.join(root, d)
-                            break
-                    if discovered_tokenizer_dir:
-                        break
-            if discovered_tokenizer_dir is None:
-                logger.warning("Could not find tokenizer directory among downloaded artifacts: %s", tokenizer_dir)
-            else:
-                self._tokenizer = ResumeAndCriteriaTokenizer.from_pretrained(tokenizer_dir)
-                logger.info("Loaded tokenizer from %s", tokenizer_dir)
+            )
+            logger.info("Loaded tokenizer from %s", tokenizer_dir)
         except Exception as e:
             logger.exception("Failed to load tokenizer: %s", e)
             # continue; tokenizer may not be strictly required if you supply an alternate encoding strategy
         if not self.cache_dir:
             tmpdir.cleanup()
-        logger.info("Model loaded in %.2fs", time.time() - t0)
+        logger.info("Tokenizer loaded in %.2fs", time.time() - t0)
+        return time.time() - t0
+
+    def _load(self):
+        t0 = time.time()
+        self._load_model()
+        self._load_tokenizer()
+        self._version = f"mlflow-{self.model_name}-v{self.model_version}"
+        logger.info("Model and tokenizer loaded in %.2fs", time.time() - t0)
 
     def predict(self, criteria: str, resume: str) -> float:
         if self._model is None:
