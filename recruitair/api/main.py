@@ -2,14 +2,28 @@ from contextlib import asynccontextmanager
 import logging
 import time
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
+from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_latest
 
 from .dependencies import get_model
 from .model import BaseEvaluatorModel
+from .monitoring import (
+    APPLICANT_CV_LENGTH_CHARS,
+    CRIT_EVAL_PREDICTION_LATENCY_SECONDS,
+    CRIT_EVAL_REQUEST_LATENCY_SECONDS,
+    CRIT_EVAL_REQUESTS_FAILED_TOTAL,
+    CRIT_EVAL_REQUESTS_TOTAL,
+    CRITERION_LENGTH_CHARS,
+)
 from .schemas import EvalRequest, EvalResponse
 
 logger = logging.getLogger("uvicorn.error")
+
+
+# -------------------------------------------------------------
+# APP LIFECYCLE
+# -------------------------------------------------------------
 
 
 @asynccontextmanager
@@ -31,21 +45,65 @@ app.add_middleware(
 )
 
 
+# -------------------------------------------------------------
+# /eval ENDPOINT WITH MONITORING
+# -------------------------------------------------------------
+
+
 @app.post("/eval", response_model=EvalResponse)
 def evaluate(request: EvalRequest, model: BaseEvaluatorModel = Depends(get_model)):
-    """Evaluate a single applicant CV against a single criterion and return score in [0,1]."""
-    t0 = time.time()
+    """
+    Evaluate a CV against a criterion and return a score in [0,1].
+    Now monitored with Prometheus metrics.
+    """
+    CRIT_EVAL_REQUESTS_TOTAL.inc()
+
+    # Observing input sizes
+    CRITERION_LENGTH_CHARS.observe(len(request.criteria_description or ""))
+    APPLICANT_CV_LENGTH_CHARS.observe(len(request.applicant_cv or ""))
+
+    # Measure endpoint latency
+    endpoint_start = time.time()
+
     try:
+        # Measure model prediction time
+        model_start = time.time()
         score = model.predict(request.criteria_description, request.applicant_cv)
+        CRIT_EVAL_PREDICTION_LATENCY_SECONDS.observe(time.time() - model_start)
+
     except Exception as exc:
+        CRIT_EVAL_REQUESTS_FAILED_TOTAL.inc()
         logger.exception("Model prediction failed: %s", exc)
         raise HTTPException(status_code=500, detail="Model prediction failed")
-    elapsed = time.time() - t0
+
+    finally:
+        CRIT_EVAL_REQUEST_LATENCY_SECONDS.observe(time.time() - endpoint_start)
+
     return EvalResponse(
-        score=score, model_version=getattr(model, "version", None), elapsed_seconds=elapsed
+        score=score,
+        model_version=getattr(model, "version", None),
+        elapsed_seconds=time.time() - endpoint_start,
     )
+
+
+# -------------------------------------------------------------
+# HEALTH CHECK
+# -------------------------------------------------------------
 
 
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+# -------------------------------------------------------------
+# /metrics ENDPOINT FOR PROMETHEUS
+# -------------------------------------------------------------
+
+
+@app.get("/metrics")
+def metrics():
+    """
+    Expose Prometheus metrics for scraping.
+    """
+    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
