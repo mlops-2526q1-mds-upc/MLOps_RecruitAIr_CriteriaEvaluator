@@ -50,6 +50,11 @@ USER appuser
 
 COPY . .
 
+RUN mkdir -p /home/appuser/.cache/recruitair && \
+    chmod -R 700 /home/appuser/.cache/recruitair
+VOLUME /home/appuser/.cache/recruitair
+ENV RECRUITAIR_CACHE_DIR=/home/appuser/.cache/recruitair
+
 EXPOSE 8000
 
 CMD ["uvicorn", "recruitair.api.main:app", "--host", "0.0.0.0", "--port", "8000"]

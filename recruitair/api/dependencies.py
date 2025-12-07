@@ -11,6 +11,8 @@ def get_model() -> BaseEvaluatorModel:
     if os.getenv("MLFLOW_TRACKING_URI") is None:
         raise EnvironmentError("Please set the MLFLOW_TRACKING_URI environment variable.")
     return TorchMLflowEvaluator(
-        model_uri=f"models:/{settings.model}/{settings.model_version}",
+        model_name=settings.model,
+        model_version=settings.model_version,
+        cache_dir=settings.cache_dir,
         device=settings.device,
     )
