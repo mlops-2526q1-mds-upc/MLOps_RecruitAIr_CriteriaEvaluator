@@ -14,5 +14,3 @@ providers:
     options:
       path: /opt/grafana-dashboards
       foldersFromFilesStructure: true
-
-dashboards:
