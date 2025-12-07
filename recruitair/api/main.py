@@ -6,6 +6,7 @@ from fastapi import Depends, FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_latest
 
+from .config import settings
 from .dependencies import get_model
 from .model import BaseEvaluatorModel
 from .monitoring import (
@@ -35,7 +36,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="Applicant Evaluator API", version="v1", lifespan=lifespan)
+app = FastAPI(title="Applicant Evaluator API", version="v1", lifespan=lifespan, root_path=settings.api_root_path)
 
 app.add_middleware(
     CORSMiddleware,
@@ -106,4 +107,5 @@ def metrics():
     """
     Expose Prometheus metrics for scraping.
     """
+    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
     return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
