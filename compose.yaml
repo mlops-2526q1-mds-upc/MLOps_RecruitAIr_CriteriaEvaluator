@@ -13,6 +13,7 @@ services:
     volumes:
       # Pass AWS credentials
       - ~/.aws/credentials:/home/appuser/.aws/credentials:ro
+      - evaluator-cache:/home/appuser/.cache/recruitair
 
   prometheus:
     image: prom/prometheus:latest
@@ -43,5 +44,5 @@ services:
     restart: unless-stopped
 
 volumes:
-  ollama-data:
   grafana-storage:
+  evaluator-cache:
