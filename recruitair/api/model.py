@@ -38,7 +38,9 @@ class DummyEvaluator(BaseEvaluatorModel):
     def _tokenize(self, text: str):
         return [
             w
-            for w in "".join(ch if (ch.isalnum() or ch.isspace()) else " " for ch in text.lower()).split()
+            for w in "".join(
+                ch if (ch.isalnum() or ch.isspace()) else " " for ch in text.lower()
+            ).split()
             if len(w) > 1
         ]
 
@@ -49,7 +51,9 @@ class DummyEvaluator(BaseEvaluatorModel):
             return 0.0
         import math
 
-        score = len(c_tokens.intersection(r_tokens)) / (math.sqrt(len(c_tokens) * len(r_tokens)) + 1e-9)
+        score = len(c_tokens.intersection(r_tokens)) / (
+            math.sqrt(len(c_tokens) * len(r_tokens)) + 1e-9
+        )
         return max(0.0, min(1.0, float(score)))
 
 
@@ -62,10 +66,17 @@ class TorchMLflowEvaluator(BaseEvaluatorModel):
     """
 
     def __init__(
-        self, model_name: str, model_version: str, device: Optional[str] = None, *, cache_dir: Optional[str] = None
+        self,
+        model_name: str,
+        model_version: str,
+        device: Optional[str] = None,
+        *,
+        cache_dir: Optional[str] = None,
     ):
         assert isinstance(model_name, str) and model_name, "model_name must be a non-empty string"
-        assert isinstance(model_version, str) and model_version, "model_version must be a non-empty string"
+        assert (
+            isinstance(model_version, str) and model_version
+        ), "model_version must be a non-empty string"
         self.model_name = model_name
         self.model_version = model_version
         self._device = device or ("cuda" if torch.cuda.is_available() else "cpu")
@@ -86,7 +97,9 @@ class TorchMLflowEvaluator(BaseEvaluatorModel):
     @property
     def cache_dir(self) -> Optional[str]:
         if self._cache_dir:
-            res = os.path.join(self._cache_dir, "mlflow_models", self.model_name, self.model_version)
+            res = os.path.join(
+                self._cache_dir, "mlflow_models", self.model_name, self.model_version
+            )
             return res
         return None
 
@@ -103,7 +116,9 @@ class TorchMLflowEvaluator(BaseEvaluatorModel):
             # Check if the model is already cached
             if os.listdir(model_dir) != []:
                 logger.info("Loading model from cache directory: %s", model_dir)
-                self._model = mlflow.pytorch.load_model(model_uri=model_dir, map_location=self._device)
+                self._model = mlflow.pytorch.load_model(
+                    model_uri=model_dir, map_location=self._device
+                )
             else:
                 logger.info("Downloading model into cache directory: %s", model_dir)
                 with FileLock(os.path.join(self.cache_dir, "model.lock")):
@@ -112,7 +127,9 @@ class TorchMLflowEvaluator(BaseEvaluatorModel):
                     )
         else:
             # mlflow.pytorch.load_model will return the model (same approach used in your notebook)
-            self._model = mlflow.pytorch.load_model(model_uri=self.model_uri, map_location=self._device)
+            self._model = mlflow.pytorch.load_model(
+                model_uri=self.model_uri, map_location=self._device
+            )
         logger.info("Model loaded from %s", self.model_uri)
         return time.monotonic() - t0
 
@@ -129,7 +146,9 @@ class TorchMLflowEvaluator(BaseEvaluatorModel):
             tokenizer_dir = tmpdir.name
             logger.info("Downloading model artifacts to %s", tokenizer_dir)
             try:
-                mlflow.artifacts.download_artifacts(artifact_uri=self.model_uri, dst_path=tokenizer_dir)
+                mlflow.artifacts.download_artifacts(
+                    artifact_uri=self.model_uri, dst_path=tokenizer_dir
+                )
             except Exception as e:
                 logger.exception("Failed to download model artifacts: %s", e)
         else:
@@ -140,7 +159,9 @@ class TorchMLflowEvaluator(BaseEvaluatorModel):
                 os.makedirs(tokenizer_dir, exist_ok=True)
                 with FileLock(os.path.join(self.cache_dir, "tokenizer.lock")):
                     try:
-                        mlflow.artifacts.download_artifacts(artifact_uri=self.model_uri, dst_path=tokenizer_dir)
+                        mlflow.artifacts.download_artifacts(
+                            artifact_uri=self.model_uri, dst_path=tokenizer_dir
+                        )
                     except Exception as e:
                         logger.exception("Failed to download model artifacts: %s", e)
             else:
@@ -173,9 +194,13 @@ class TorchMLflowEvaluator(BaseEvaluatorModel):
         # Prepare input with tokenizer
         if self._tokenizer is None:
             # If tokenizer missing, fall back to naive string input (not ideal)
-            raise RuntimeError("Tokenizer not found. Please ensure tokenizer was logged with the model.")
+            raise RuntimeError(
+                "Tokenizer not found. Please ensure tokenizer was logged with the model."
+            )
         # tokenizer usage matches the training:
-        encoded = self._tokenizer([resume], [criteria], padding=True, return_tensors="pt", padding_side="left")
+        encoded = self._tokenizer(
+            [resume], [criteria], padding=True, return_tensors="pt", padding_side="left"
+        )
         # move tensors to device
         device = torch.device(self._device)
         encoded = {k: v.to(device) for k, v in encoded.items()}
