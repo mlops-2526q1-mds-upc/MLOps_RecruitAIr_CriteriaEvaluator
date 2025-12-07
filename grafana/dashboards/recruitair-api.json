@@ -1,0 +1,78 @@
+{
+    "title": "RecruitAIr - Criteria Evaluator API",
+    "uid": "recruitair-criteria-evaluator-api",
+    "schemaVersion": 39,
+    "version": 1,
+    "panels": [
+        {
+            "type": "stat",
+            "title": "Total /eval Requests",
+            "id": 1,
+            "targets": [
+                {
+                    "expr": "sum(recruitair_criteria_eval_requests_total)",
+                    "refId": "A"
+                }
+            ]
+        },
+        {
+            "type": "stat",
+            "title": "Failed Requests",
+            "id": 2,
+            "targets": [
+                {
+                    "expr": "sum(recruitair_criteria_eval_requests_failed_total)",
+                    "refId": "A"
+                }
+            ]
+        },
+        {
+            "type": "timeseries",
+            "title": "p95 API Latency (seconds)",
+            "id": 3,
+            "targets": [
+                {
+                    "expr": "histogram_quantile(0.95, sum(rate(recruitair_criteria_eval_latency_seconds_bucket[5m])) by (le))",
+                    "refId": "A"
+                }
+            ]
+        },
+        {
+            "type": "timeseries",
+            "title": "Model Prediction Latency (p95)",
+            "id": 4,
+            "targets": [
+                {
+                    "expr": "histogram_quantile(0.95, sum(rate(recruitair_criteria_model_prediction_latency_seconds_bucket[5m])) by (le))",
+                    "refId": "A"
+                }
+            ]
+        },
+        {
+            "type": "timeseries",
+            "title": "Average Criterion Text Length",
+            "id": 5,
+            "targets": [
+                {
+                    "expr": "sum(rate(recruitair_criteria_description_length_chars_sum[5m])) / sum(rate(recruitair_criteria_description_length_chars_count[5m]))",
+                    "refId": "A"
+                }
+            ]
+        },
+        {
+            "type": "timeseries",
+            "title": "Average CV Length",
+            "id": 6,
+            "targets": [
+                {
+                    "expr": "sum(rate(recruitair_applicant_cv_length_chars_sum[5m])) / sum(rate(recruitair_applicant_cv_length_chars_count[5m]))",
+                    "refId": "A"
+                }
+            ]
+        }
+    ],
+    "time": {
+        "from": "now-1h",
+        "to": "now"
+    }
+}

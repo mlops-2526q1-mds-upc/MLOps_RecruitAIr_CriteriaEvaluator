@@ -26,27 +26,24 @@ CRIT_EVAL_REQUEST_LATENCY_SECONDS = Histogram(
 
 # --- Model-level metrics ---
 
-CRIT_MODEL_EVAL_LATENCY_SECONDS = Histogram(
+CRIT_EVAL_PREDICTION_LATENCY_SECONDS = Histogram(
     "recruitair_criteria_model_evaluation_latency_seconds",
     "Time spent in evaluator model (criteria evaluation) in seconds",
     buckets=(0.05, 0.1, 0.25, 0.5, 1, 2, 5, 10),
 )
 
-CRIT_MODEL_EVAL_ERRORS_TOTAL = Counter(
-    "recruitair_criteria_model_evaluation_errors_total",
-    "Total number of exceptions raised by criteria evaluation model",
-)
-
 # --- Payload / business metrics ---
 
-REQUEST_NUM_CRITERIA = Histogram(
-    "recruitair_criteria_request_num_criteria",
-    "Number of criteria provided in /eval requests",
-    buckets=(1, 3, 5, 10, 20, 50),
+
+CRITERION_LENGTH_CHARS = Histogram(
+    "recruitair_criteria_description_length_chars",
+    "Length of criteria_description input",
+    buckets=(32, 64, 128, 256, 512, 1024),
 )
 
-PROFILE_TEXT_LENGTH = Histogram(
-    "recruitair_criteria_profile_text_length_chars",
-    "Length of profile text provided for evaluation (chars)",
+
+APPLICANT_CV_LENGTH_CHARS = Histogram(
+    "recruitair_applicant_cv_length_chars",
+    "Length of applicant CV input",
     buckets=(128, 256, 512, 1024, 2048, 4096, 8192),
 )

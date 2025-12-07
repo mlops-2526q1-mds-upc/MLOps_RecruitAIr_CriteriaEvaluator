@@ -1,38 +1,29 @@
 services:
-  criteria-evaluator-api:
+  evaluator-api:
     build: .
-    container_name: criteria-evaluator-api
+    container_name: evaluator-api
     ports:
       - "8000:8000"
     environment:
       # adapt these to whatever your service uses, or remove if not needed
-      - RECRUITAIR_MODEL=dolphin3
-      - RECRUITAIR_MODEL_VERSION=8b
-      - RECRUITAIR_PROMPT=criteria-evaluator
-      - RECRUITAIR_PROMPT_VERSION=1
-      - RECRUITAIR_OLLAMA_BASE_URL=http://ollama:11434
-    depends_on:
-      - ollama
+      - RECRUITAIR_MODEL=criteria-evaluation
+      - RECRUITAIR_MODEL_VERSION=1
+      - MLFLOW_TRACKING_URI=https://ml-4cb370e118ec407c83eed254868ebce1.ecs.eu-north-1.on.aws/
     restart: unless-stopped
-
-  ollama:
-    image: ollama/ollama:latest
-    container_name: ollama
-    ports:
-      - "11434:11434"
     volumes:
-      - ollama-data:/root/.ollama
-    restart: unless-stopped
+      # Pass AWS credentials
+      - ~/.aws/credentials:/home/appuser/.aws/credentials:ro
 
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
-    ports:
-      - "9090:9090"
+    # ports:
+    #   - "9090:9090"
+      # Uncomment the above line to expose Prometheus UI if needed (by default, use grafana to visualize)
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
     depends_on:
-      - criteria-evaluator-api
+      - evaluator-api
     restart: unless-stopped
 
   grafana:
@@ -44,11 +35,13 @@ services:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
-      - grafana-data:/var/lib/grafana
+      - grafana-storage:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/opt/grafana-dashboards:ro
     depends_on:
       - prometheus
     restart: unless-stopped
 
 volumes:
   ollama-data:
-  grafana-data:
+  grafana-storage:

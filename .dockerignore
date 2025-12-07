@@ -47,3 +47,5 @@ MagicMock/
 .dvcignore
 dvc.lock
 dvc.yaml
+prometheus.yml
+grafana/

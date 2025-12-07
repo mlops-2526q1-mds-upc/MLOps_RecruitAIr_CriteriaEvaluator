@@ -4,62 +4,27 @@ import time
 
 from fastapi import Depends, FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
-from prometheus_client import (
-    Counter,
-    Histogram,
-    CONTENT_TYPE_LATEST,
-    generate_latest,
-)
+from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_latest
 
 from .dependencies import get_model
 from .model import BaseEvaluatorModel
+from .monitoring import (
+    APPLICANT_CV_LENGTH_CHARS,
+    CRIT_EVAL_PREDICTION_LATENCY_SECONDS,
+    CRIT_EVAL_REQUEST_LATENCY_SECONDS,
+    CRIT_EVAL_REQUESTS_FAILED_TOTAL,
+    CRIT_EVAL_REQUESTS_TOTAL,
+    CRITERION_LENGTH_CHARS,
+)
 from .schemas import EvalRequest, EvalResponse
 
 logger = logging.getLogger("uvicorn.error")
 
 
 # -------------------------------------------------------------
-# PROMETHEUS METRICS
-# -------------------------------------------------------------
-
-CRIT_EVAL_REQUESTS_TOTAL = Counter(
-    "recruitair_criteria_eval_requests_total",
-    "Total number of /eval requests received by CriteriaEvaluator",
-)
-
-CRIT_EVAL_REQUESTS_FAILED_TOTAL = Counter(
-    "recruitair_criteria_eval_requests_failed_total",
-    "Total number of /eval requests that failed",
-)
-
-CRIT_EVAL_LATENCY_SECONDS = Histogram(
-    "recruitair_criteria_eval_latency_seconds",
-    "Latency of /eval endpoint in seconds",
-    buckets=(0.01, 0.05, 0.1, 0.25, 0.5, 1, 2, 5),
-)
-
-CRIT_MODEL_PREDICTION_LATENCY_SECONDS = Histogram(
-    "recruitair_criteria_model_prediction_latency_seconds",
-    "Time spent inside model.predict()",
-    buckets=(0.01, 0.05, 0.1, 0.25, 0.5, 1, 2, 5),
-)
-
-CRITERION_LENGTH_CHARS = Histogram(
-    "recruitair_criteria_description_length_chars",
-    "Length of criteria_description input",
-    buckets=(32, 64, 128, 256, 512, 1024),
-)
-
-APPLICANT_CV_LENGTH_CHARS = Histogram(
-    "recruitair_applicant_cv_length_chars",
-    "Length of applicant CV input",
-    buckets=(128, 256, 512, 1024, 2048, 4096, 8192),
-)
-
-
-# -------------------------------------------------------------
 # APP LIFECYCLE
 # -------------------------------------------------------------
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -84,6 +49,7 @@ app.add_middleware(
 # /eval ENDPOINT WITH MONITORING
 # -------------------------------------------------------------
 
+
 @app.post("/eval", response_model=EvalResponse)
 def evaluate(request: EvalRequest, model: BaseEvaluatorModel = Depends(get_model)):
     """
@@ -103,7 +69,7 @@ def evaluate(request: EvalRequest, model: BaseEvaluatorModel = Depends(get_model
         # Measure model prediction time
         model_start = time.time()
         score = model.predict(request.criteria_description, request.applicant_cv)
-        CRIT_MODEL_PREDICTION_LATENCY_SECONDS.observe(time.time() - model_start)
+        CRIT_EVAL_PREDICTION_LATENCY_SECONDS.observe(time.time() - model_start)
 
     except Exception as exc:
         CRIT_EVAL_REQUESTS_FAILED_TOTAL.inc()
@@ -111,7 +77,7 @@ def evaluate(request: EvalRequest, model: BaseEvaluatorModel = Depends(get_model
         raise HTTPException(status_code=500, detail="Model prediction failed")
 
     finally:
-        CRIT_EVAL_LATENCY_SECONDS.observe(time.time() - endpoint_start)
+        CRIT_EVAL_REQUEST_LATENCY_SECONDS.observe(time.time() - endpoint_start)
 
     return EvalResponse(
         score=score,
@@ -124,6 +90,7 @@ def evaluate(request: EvalRequest, model: BaseEvaluatorModel = Depends(get_model
 # HEALTH CHECK
 # -------------------------------------------------------------
 
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
@@ -132,6 +99,7 @@ def health():
 # -------------------------------------------------------------
 # /metrics ENDPOINT FOR PROMETHEUS
 # -------------------------------------------------------------
+
 
 @app.get("/metrics")
 def metrics():
