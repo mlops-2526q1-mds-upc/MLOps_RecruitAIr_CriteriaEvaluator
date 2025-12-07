@@ -37,7 +37,9 @@ class DummyEvaluator(BaseEvaluatorModel):
     def _tokenize(self, text: str):
         return [
             w
-            for w in "".join(ch if (ch.isalnum() or ch.isspace()) else " " for ch in text.lower()).split()
+            for w in "".join(
+                ch if (ch.isalnum() or ch.isspace()) else " " for ch in text.lower()
+            ).split()
             if len(w) > 1
         ]
 
@@ -48,7 +50,9 @@ class DummyEvaluator(BaseEvaluatorModel):
             return 0.0
         import math
 
-        score = len(c_tokens.intersection(r_tokens)) / (math.sqrt(len(c_tokens) * len(r_tokens)) + 1e-9)
+        score = len(c_tokens.intersection(r_tokens)) / (
+            math.sqrt(len(c_tokens) * len(r_tokens)) + 1e-9
+        )
         return max(0.0, min(1.0, float(score)))
 
 
@@ -77,7 +81,9 @@ class TorchMLflowEvaluator(BaseEvaluatorModel):
         # load model via mlflow
         logger.info("Loading model from mlflow uri=%s", self.model_uri)
         # mlflow.pytorch.load_model will return the model (same approach used in your notebook)
-        self._model = mlflow.pytorch.load_model(model_uri=self.model_uri, map_location=self._device)
+        self._model = mlflow.pytorch.load_model(
+            model_uri=self.model_uri, map_location=self._device
+        )
         # try to fetch model version from uri or model metadata
         self._version = self.model_uri
 
@@ -109,7 +115,9 @@ class TorchMLflowEvaluator(BaseEvaluatorModel):
                         if tokenizer_dir:
                             break
                 if tokenizer_dir is None:
-                    logger.warning("Could not find tokenizer directory among downloaded artifacts: %s", tmpdir)
+                    logger.warning(
+                        "Could not find tokenizer directory among downloaded artifacts: %s", tmpdir
+                    )
                 else:
                     self._tokenizer = ResumeAndCriteriaTokenizer.from_pretrained(tokenizer_dir)
                     logger.info("Loaded tokenizer from %s", tokenizer_dir)
@@ -134,9 +142,13 @@ class TorchMLflowEvaluator(BaseEvaluatorModel):
         # Prepare input with tokenizer
         if self._tokenizer is None:
             # If tokenizer missing, fall back to naive string input (not ideal)
-            raise RuntimeError("Tokenizer not found. Please ensure tokenizer was logged with the model.")
+            raise RuntimeError(
+                "Tokenizer not found. Please ensure tokenizer was logged with the model."
+            )
         # tokenizer usage matches the training:
-        encoded = self._tokenizer([resume], [criteria], padding=True, return_tensors="pt", padding_side="left")
+        encoded = self._tokenizer(
+            [resume], [criteria], padding=True, return_tensors="pt", padding_side="left"
+        )
         # move tensors to device
         device = torch.device(self._device)
         encoded = {k: v.to(device) for k, v in encoded.items()}
